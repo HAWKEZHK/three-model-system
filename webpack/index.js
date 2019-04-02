@@ -1,6 +1,8 @@
 const { resolve, join } = require('path');
 const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Autoprefixer = require('autoprefixer');
+const Cssnano = require('cssnano');
 
 module.exports = {
   mode: "development", // 开发环境
@@ -72,8 +74,8 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               plugins: () => [
-                require('autoprefixer')({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS浏览器兼容
-                require('cssnano')(), // 压缩css
+                Autoprefixer({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS 浏览器兼容
+                Cssnano(), // 压缩css
               ]
             }
           },
