@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"sourceMap": true, // 生成 sourceMap
+		"module": "esnext", // 组织代码方式
+		"target": "es5", // 编译目标结果
+		"lib": ["dom", "es7"], // 编译过程中需要引入的库文件的列表
+		"moduleResolution": "node", // 模块的解析
+		"baseUrl": "src", // 解析非相对模块名的基准目录
+		"paths": { "@/*": ["./*"] }, // 模块名到基于 baseUrl 的路径映射的列表
+		"jsx": "Preserve",
+		"noUnusedLocals": true, // 若有未使用的局部变量则抛错
+		"importHelpers": true, // 从 tslib 导入辅助工具函数
+		"strict": true, // 启用所有严格类型检查选项
+		"allowSyntheticDefaultImports": true, // 允许从没有设置默认导出的模块中默认导入
+		"noImplicitAny": true, // 是否使编译器推断出变量类型
+		"suppressImplicitAnyIndexErrors": true, // 防止隐式索引报错
+		"removeComments": true, // 删除掉注释
+		"experimentalDecorators": true // 启用装饰器
+	},
+	"include": ["./src/**/*"],
+	"exclude": ["node_modules"]
+}
