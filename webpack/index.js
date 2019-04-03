@@ -3,6 +3,7 @@ const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Autoprefixer = require('autoprefixer');
 const Cssnano = require('cssnano');
+const modifyVars = require('../static/template/antd-custom');
 
 module.exports = {
   mode: "development", // 开发环境
@@ -64,14 +65,7 @@ module.exports = {
           'css-loader',
           {
             loader: 'less-loader',
-            options: {
-              modifyVars: { // antd 自定义主题
-                'primary-color': '#1DA57A',
-                'link-color': '#1DA57A',
-                'border-radius-base': '2px',
-              },
-              javascriptEnabled: true,
-            },
+            options: { javascriptEnabled: true, modifyVars },
           }
         ],
       }, {
