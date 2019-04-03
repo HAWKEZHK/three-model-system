@@ -76,7 +76,7 @@ module.exports = {
         ],
       }, {
         test: /\.less$/,
-        exclude: /node_modules/,  // 仅限业务代码的样式
+        exclude: /node_modules/, // 仅限业务代码的样式
         use: [
           'style-loader',
           {
