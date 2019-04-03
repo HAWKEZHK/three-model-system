@@ -1,15 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button } from 'antd';
 
-import styles from './index.less';
+import { Home } from '@/pages';
 
-const { init } = styles;
-
-ReactDOM.render(
-  <div className={init}>
-    init
-    <Button type="primary">init</Button>
-  </div>,
-  document.getElementById('root') as HTMLElement,
-);
+ReactDOM.render(<Home />, document.getElementById('root') as HTMLElement);

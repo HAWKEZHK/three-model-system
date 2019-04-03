@@ -54,7 +54,7 @@ module.exports = {
         use: [
           {
             loader: 'tslint-loader',
-            options: { emitErrors: true, failOnHint: true, fix: true }
+            options: { emitErrors: true, failOnHint: true, fix: false }
           }
         ]
       }, {
