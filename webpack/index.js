@@ -3,7 +3,15 @@ const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Autoprefixer = require('autoprefixer');
 const Cssnano = require('cssnano');
-const modifyVars = require('../static/template/antd-custom');
+
+const modifyVars = require('../src/static/template/antd-custom'); // antd 自定义主题
+const template = 'src/static/template/index.html'; // 页面模板
+const browsers = [ // css 自动补全作用的浏览器版本
+  'last 10 Chrome versions',
+  'last 5 Firefox versions',
+  'Safari >= 6',
+  'ie> 8',
+];
 
 module.exports = {
   mode: "development", // 开发环境
@@ -32,7 +40,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'static/template/index.html', // 提供模板
+      template, // 提供模板
       minify:{
         removeComments: true, // 移除 HTML 中的注释
         collapseWhitespace: true, // 删除空白符与换行符
@@ -59,7 +67,7 @@ module.exports = {
         ]
       }, {
         test: /\.less$/,
-        exclude: /src/, // 仅限组件样式
+        exclude: /src/, // 排除业务代码
         use: [
           'style-loader',
           'css-loader',
@@ -70,7 +78,7 @@ module.exports = {
         ],
       }, {
         test: /\.less$/,
-        exclude: /node_modules/, // 仅限业务代码的样式
+        exclude: /node_modules/, // 排除 node_modules
         use: [
           'style-loader',
           {
@@ -83,7 +91,7 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               plugins: [
-                Autoprefixer({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS 浏览器兼容
+                Autoprefixer({ browsers }), // CSS 浏览器兼容
                 Cssnano(), // 压缩css
               ]
             }
