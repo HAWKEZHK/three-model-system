@@ -3,7 +3,9 @@ const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const Autoprefixer = require('autoprefixer');
 const Cssnano = require('cssnano');
-const modifyVars = require('../static/template/antd-custom');
+
+const modifyVars = require('../src/static/template/antd-custom');
+const template = 'src/static/template/index.html';
 
 module.exports = {
   mode: "development", // 开发环境
@@ -32,7 +34,7 @@ module.exports = {
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'static/template/index.html', // 提供模板
+      template, // 提供模板
       minify:{
         removeComments: true, // 移除 HTML 中的注释
         collapseWhitespace: true, // 删除空白符与换行符
