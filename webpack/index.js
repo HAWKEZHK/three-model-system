@@ -1,6 +1,8 @@
 const { resolve, join } = require('path');
 const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const Autoprefixer = require('autoprefixer');
+const Cssnano = require('cssnano');
 
 module.exports = {
   mode: "development", // 开发环境
@@ -43,23 +45,38 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
         use: ['babel-loader', 'ts-loader'],
-        exclude: /node_modules/, // 排除
       }, {
         test: /\.tsx?$/,
         enforce: 'pre',
         use: [
           {
             loader: 'tslint-loader',
-            options: {
-              emitErrors: true,
-              failOnHint: true,
-              fix: true,
-            }
+            options: { emitErrors: true, failOnHint: true, fix: true }
           }
         ]
       }, {
         test: /\.less$/,
+        exclude: /src/, // 仅限组件样式
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              modifyVars: { // antd 自定义主题
+                'primary-color': '#1DA57A',
+                'link-color': '#1DA57A',
+                'border-radius-base': '2px',
+              },
+              javascriptEnabled: true,
+            },
+          }
+        ],
+      }, {
+        test: /\.less$/,
+        exclude: /node_modules/,  // 仅限业务代码的样式
         use: [
           'style-loader',
           {
@@ -71,20 +88,24 @@ module.exports = {
           }, {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [
-                require('autoprefixer')({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS浏览器兼容
-                require('cssnano')(), // 压缩css
+              plugins: [
+                Autoprefixer({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS 浏览器兼容
+                Cssnano(), // 压缩css
               ]
             }
+          }, {
+            loader: 'less-loader',
+            options: { javascriptEnabled: true },
           },
-          'less-loader',
         ],
       }, {
-        test: /\.(png|jpg|gif|woff|woff2|eot|ttf)$/,
-        use: [{ loader: 'url-loader', options: { limit: 100000 } }],
-      }, {
-        test: /\.svg/,
-        use: [{ loader: 'url-loader', options: { limit: 100000, minetype: 'image/svg+xml' } }],
+        test: /\.(png|jpg|gif|woff|woff2|eot|ttf|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: { limit: 100000 },
+          }
+        ],
       },
     ]
   },

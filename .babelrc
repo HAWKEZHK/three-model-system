@@ -3,4 +3,7 @@
     "@babel/preset-react",
     ["@babel/preset-env", { "modules": false }]
   ],
+  "plugins": [
+    ["import", { "libraryName": "antd", "libraryDirectory": "es", "style": true }]
+  ]
 }
