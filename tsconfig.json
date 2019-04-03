@@ -7,7 +7,7 @@
 		"moduleResolution": "node", // 模块的解析
 		"baseUrl": "src", // 解析非相对模块名的基准目录
 		"paths": { "@/*": ["./*"] }, // 模块名到基于 baseUrl 的路径映射的列表
-		"jsx": "Preserve", // 在 tsx 文件里支持 jsx
+		"jsx": "preserve", // 在 tsx 文件里支持 jsx
 		"noUnusedLocals": true, // 若有未使用的局部变量则抛错
 		"importHelpers": true, // 从 tslib 导入辅助工具函数
 		"strict": true, // 启用所有严格类型检查选项
