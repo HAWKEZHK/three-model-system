@@ -45,23 +45,24 @@ module.exports = {
     rules: [
       {
         test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
         use: ['babel-loader', 'ts-loader'],
-        exclude: /node_modules/, // 排除
       }, {
         test: /\.tsx?$/,
         enforce: 'pre',
         use: [
           {
             loader: 'tslint-loader',
-            options: {
-              emitErrors: true,
-              failOnHint: true,
-              fix: true,
-            }
+            options: { emitErrors: true, failOnHint: true, fix: true }
           }
         ]
       }, {
         test: /\.less$/,
+        exclude: /src/, // 仅限组件样式
+        use: ['style-loader', 'css-loader', 'less-loader'],
+      }, {
+        test: /\.less$/,
+        exclude: /node_modules/, // 仅限业务代码的样式
         use: [
           'style-loader',
           {
@@ -73,7 +74,7 @@ module.exports = {
           }, {
             loader: 'postcss-loader',
             options: {
-              plugins: () => [
+              plugins: [
                 Autoprefixer({ browsers: ['FireFox > 1', 'Chrome > 1', 'ie >= 8'] }), // CSS 浏览器兼容
                 Cssnano(), // 压缩css
               ]
@@ -82,11 +83,8 @@ module.exports = {
           'less-loader',
         ],
       }, {
-        test: /\.(png|jpg|gif|woff|woff2|eot|ttf)$/,
+        test: /\.(png|jpg|gif|woff|woff2|eot|ttf|svg)$/,
         use: [{ loader: 'url-loader', options: { limit: 100000 } }],
-      }, {
-        test: /\.svg/,
-        use: [{ loader: 'url-loader', options: { limit: 100000, minetype: 'image/svg+xml' } }],
       },
     ]
   },

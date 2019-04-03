@@ -5,4 +5,7 @@ import styles from './index.less';
 
 const { init } = styles;
 
-ReactDOM.render(<div className={init}>init</div>, document.getElementById('root') as HTMLElement);
+ReactDOM.render(
+  <div className={init}>init</div>,
+  document.getElementById('root') as HTMLElement,
+);
