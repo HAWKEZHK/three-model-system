@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { Home } from '@/pages';
+import { PageFrame } from '@/common/components';
+import { Stage, Operation } from '@/components';
 
-ReactDOM.render(<Home />, document.getElementById('root') as HTMLElement);
+ReactDOM.render(
+  <PageFrame siderComp={<Operation />} contentComp={<Stage />} />,
+  document.getElementById('root') as HTMLElement,
+);
