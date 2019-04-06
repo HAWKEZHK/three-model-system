@@ -12,14 +12,18 @@
   "dependencies": {
     "antd": "^3.16.1",
     "react": "^16.8.6",
-    "react-dom": "^16.8.6"
+    "react-dom": "^16.8.6",
+    "three": "0.83.0",
+    "three-orbitcontrols": "^2.102.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
     "@babel/preset-react": "^7.0.0",
+    "@types/node": "^11.13.0",
     "@types/react": "^16.8.10",
     "@types/react-dom": "^16.8.3",
+    "@types/three": "^0.93.30",
     "autoprefixer": "^9.5.0",
     "babel-loader": "^8.0.5",
     "babel-plugin-import": "^1.11.0",

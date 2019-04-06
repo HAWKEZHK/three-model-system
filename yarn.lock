@@ -672,6 +672,11 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@types/node@^11.13.0":
+  version "11.13.0"
+  resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-11.13.0.tgz#b0df8d6ef9b5001b2be3a94d909ce3c29a80f9e1"
+  integrity sha1-sN+Nbvm1ABsr46lNkJzjwpqA+eE=
+
 "@types/prop-types@*":
   version "15.7.0"
   resolved "http://registry.npm.taobao.org/@types/prop-types/download/@types/prop-types-15.7.0.tgz#4c48fed958d6dcf9487195a0ef6456d5f6e0163a"
@@ -703,6 +708,11 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
+
+"@types/three@^0.93.30":
+  version "0.93.30"
+  resolved "http://registry.npm.taobao.org/@types/three/download/@types/three-0.93.30.tgz#a1c51cb53936e45906586bdb3bfcc4e027e40960"
+  integrity sha1-ocUctTk25FkGWGvbO/zE4CfkCWA=
 
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
@@ -6555,6 +6565,16 @@ terser@^3.16.1:
     commander "^2.19.0"
     source-map "~0.6.1"
     source-map-support "~0.5.10"
+
+three-orbitcontrols@^2.102.1:
+  version "2.102.1"
+  resolved "http://registry.npm.taobao.org/three-orbitcontrols/download/three-orbitcontrols-2.102.1.tgz#f4071e79f1c12e2b7668992cb06cfa29a816629d"
+  integrity sha1-9AceefHBLit2aJkssGz6KagWYp0=
+
+three@0.83.0:
+  version "0.83.0"
+  resolved "http://registry.npm.taobao.org/three/download/three-0.83.0.tgz#3b7f94790af3e021dac1f44a2617569ca2032b0b"
+  integrity sha1-O3+UeQrz4CHawfRKJhdWnKIDKws=
 
 through2@^2.0.0:
   version "2.0.5"
