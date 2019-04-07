@@ -1,3 +1,5 @@
+import { IGeometrys } from '@/common/models';
+
 // 最大值
 export const MAX_SIZE = 1000;
 export const STEP = 50;
@@ -10,3 +12,11 @@ export const CAMARE = {
   pos: { x: 1000, y: 1000, z: 1000 }, // 相机位置
   lookAt: { x: 0, y: 0, z: 0 }, // 视点
 };
+
+// 基础几何体
+export const GEOMETRYS: { name: string, type: IGeometrys }[] = [
+  { name: '正方体', type: 'cube' },
+  { name: '球体', type: 'sphere' },
+  { name: '柱体', type: 'cylinder' },
+  { name: '环', type: 'torus' },
+];

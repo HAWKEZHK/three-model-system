@@ -6571,10 +6571,17 @@ three-orbitcontrols@^2.102.1:
   resolved "http://registry.npm.taobao.org/three-orbitcontrols/download/three-orbitcontrols-2.102.1.tgz#f4071e79f1c12e2b7668992cb06cfa29a816629d"
   integrity sha1-9AceefHBLit2aJkssGz6KagWYp0=
 
-three@0.83.0:
-  version "0.83.0"
-  resolved "http://registry.npm.taobao.org/three/download/three-0.83.0.tgz#3b7f94790af3e021dac1f44a2617569ca2032b0b"
-  integrity sha1-O3+UeQrz4CHawfRKJhdWnKIDKws=
+three-transformcontrols@^0.78.1:
+  version "0.78.1"
+  resolved "http://registry.npm.taobao.org/three-transformcontrols/download/three-transformcontrols-0.78.1.tgz#bcff06f4fd3239743d93cfc3c1f0d49ece70b5f4"
+  integrity sha1-vP8G9P0yOXQ9k8/DwfDUns5wtfQ=
+  dependencies:
+    three ">=0.78.0"
+
+three@>=0.78.0, three@^0.103.0:
+  version "0.103.0"
+  resolved "http://registry.npm.taobao.org/three/download/three-0.103.0.tgz#63b3dbccc861caad93269618061a73dadebae71b"
+  integrity sha1-Y7PbzMhhyq2TJpYYBhpz2t665xs=
 
 through2@^2.0.0:
   version "2.0.5"

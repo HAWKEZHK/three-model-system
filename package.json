@@ -13,8 +13,9 @@
     "antd": "^3.16.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "three": "0.83.0",
-    "three-orbitcontrols": "^2.102.1"
+    "three": "^0.103.0",
+    "three-orbitcontrols": "^2.102.1",
+    "three-transformcontrols": "^0.78.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",

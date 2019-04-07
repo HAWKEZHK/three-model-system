@@ -6,3 +6,7 @@ declare module 'three-orbitcontrols' {
   const module: any;
   export default module;
 }
+declare module 'three-transformcontrols' {
+  const module: any;
+  export default module;
+}

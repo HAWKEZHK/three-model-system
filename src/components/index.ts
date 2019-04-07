@@ -1,2 +1,2 @@
-export * from './stage';
+export * from './home';
 export * from './operation';
