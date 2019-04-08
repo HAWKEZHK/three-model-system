@@ -11,16 +11,16 @@ const { CheckableTag } = Tag;
 const { container, card } = styles;
 
 interface IProps {
-  addGeometry: (geometry: Mesh) => void;
+  addPreGeometry: (geometry: Mesh) => void;
 }
 interface IState {
-  geometryType: IGeometrys;
+  geometryType?: IGeometrys | null;
 }
 export class Operation extends Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
-      geometryType: 'cube',
+      geometryType: null,
     };
   }
   render() {
@@ -43,8 +43,8 @@ export class Operation extends Component<IProps, IState> {
   }
 
   private handleTypeChange = (geometryType: IGeometrys) => {
-    const { addGeometry } = this.props;
-    addGeometry(createTypeGeometry(geometryType, true));
+    const { addPreGeometry } = this.props;
+    addPreGeometry(createTypeGeometry(geometryType, true));
     this.setState({ geometryType });
   }
 }
