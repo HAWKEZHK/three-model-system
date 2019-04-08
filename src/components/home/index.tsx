@@ -12,9 +12,12 @@ import { Operation } from '../operation';
 import styles from './index.less';
 
 const { Content, Sider } = Layout;
-const { container, sider, content } = styles;
+const { container, sider, content, close } = styles;
 
-export class Home extends Component {
+interface IState {
+  collapsed: boolean; // 侧边栏状态
+}
+export class Home extends Component<{}, IState> {
   private stageRef: RefObject<HTMLDivElement>;
   private scene: Scene; // 场景
   private camera: PerspectiveCamera;  // 相机
@@ -25,6 +28,9 @@ export class Home extends Component {
 
   constructor(props: ReactPropTypes) {
     super(props);
+    this.state = {
+      collapsed: false,
+    };
     this.stageRef = createRef();
     this.scene = new Scene();
     this.camera = new PerspectiveCamera();
@@ -44,15 +50,24 @@ export class Home extends Component {
     // ));
   }
   render() {
+    const { collapsed } = this.state;
     return (
       <Layout>
         <Layout>
-          <Content className={content}>
+          <Content className={`${content}${collapsed ? ` ${close}` : ''}`}>
             <div className={container} ref={this.stageRef} />
           </Content>
         </Layout>
-        <Sider className={sider} width="300">
-          <Operation addGeometry={this.addGeometry} />
+        <Sider
+          className={sider}
+          width="300"
+          collapsedWidth="50"
+          collapsible={true}
+          collapsed={collapsed}
+          onCollapse={val => this.setState({ collapsed: val }, this.onResize)}
+          reverseArrow={true}
+        >
+          {!collapsed && <Operation addGeometry={this.addGeometry} />}
         </Sider>
       </Layout>
     );
@@ -63,12 +78,12 @@ export class Home extends Component {
     const stage = this.stageRef.current;
     if (!stage) return;
 
-    window.onresize = this.onWindowResize;
+    window.onresize = this.onResize;
     stage.onmousemove = this.onStageMove;
   }
 
-  // 窗口大小变化重新渲染
-  private onWindowResize = () => {
+  // 大小变化重新渲染
+  private onResize = () => {
     const stage = this.stageRef.current;
     if (!stage) return;
 
@@ -78,7 +93,7 @@ export class Home extends Component {
     this.camera.updateProjectionMatrix();
   }
 
-  // 窗口大小变化重新渲染
+  // 鼠标移动几何体随动
   private onStageMove = () => {
     if (!this.previewGeometry) return;
     console.info(this.previewGeometry.position);
