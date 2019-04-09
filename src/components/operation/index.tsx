@@ -1,38 +1,28 @@
 import React, { Component } from 'react';
 import { Card, Tag } from 'antd';
-import { Mesh } from 'three';
 
 import { IGeometrys } from '@/common/models';
 import { GEOMETRYS } from '@/constants';
-import { createTypeGeometry } from '@/common/helpers';
 import styles from './index.less';
 
 const { CheckableTag } = Tag;
 const { container, card } = styles;
 
 interface IProps {
-  addPreGeometry: (geometry: Mesh) => void;
+  preType: IGeometrys | null; // 几何体类型
+  setPreGeometry: (preType: IGeometrys | null) => void; // 设置几何体
 }
-interface IState {
-  geometryType?: IGeometrys | null;
-}
-export class Operation extends Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      geometryType: null,
-    };
-  }
+export class Operation extends Component<IProps> {
   render() {
-    const { geometryType } = this.state;
+    const { preType, setPreGeometry } = this.props;
     return (
       <div className={container}>
         <Card className={card} title="基础几何体" size="small" bordered={false}>
           {GEOMETRYS.map(({ name, type }) => (
             <CheckableTag
               key={type}
-              checked={type === geometryType}
-              onChange={() => this.handleTypeChange(type)}
+              checked={type === preType}
+              onChange={() => setPreGeometry(type)}
             >
               {name}
             </CheckableTag>
@@ -40,11 +30,5 @@ export class Operation extends Component<IProps, IState> {
         </Card>
       </div>
     );
-  }
-
-  private handleTypeChange = (geometryType: IGeometrys) => {
-    const { addPreGeometry } = this.props;
-    addPreGeometry(createTypeGeometry(geometryType, true));
-    this.setState({ geometryType });
   }
 }

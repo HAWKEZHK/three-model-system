@@ -2,7 +2,10 @@ import { IGeometrys } from '@/common/models';
 
 // 最大值
 export const MAX_SIZE = 1000;
+// 一个刻度
 export const STEP = 50;
+// 几何体颜色
+export const BASE_COLOR = '#ff0000';
 
 // 相机
 export const CAMARE = {

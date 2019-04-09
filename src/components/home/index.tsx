@@ -3,13 +3,15 @@ import { Layout } from 'antd';
 
 import {
   Scene, WebGLRenderer, PerspectiveCamera, ArrowHelper, Raycaster,
-  Geometry, Mesh, MeshBasicMaterial, Vector2, Vector3,
-  AmbientLight, LineSegments, LineBasicMaterial, PlaneBufferGeometry,
+  Geometry, Mesh, MeshLambertMaterial, Vector2, Vector3,
+  AmbientLight, DirectionalLight, LineSegments, LineBasicMaterial, PlaneBufferGeometry,
 } from 'three';
 import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
 
-import { MAX_SIZE, STEP, CAMARE } from '@/constants';
+import { createTypePreGeometry } from '@/common/helpers';
+import { MAX_SIZE, STEP, CAMARE, BASE_COLOR } from '@/constants';
+import { IGeometrys } from '@/common/models';
 import { Operation } from '../operation';
 import styles from './index.less';
 
@@ -18,6 +20,7 @@ const { container, sider, content, close } = styles;
 
 interface IState {
   collapsed: boolean; // 侧边栏状态
+  preType: IGeometrys | null; // 预览类型
 }
 export class Home extends Component<{}, IState> {
   private stageRef: RefObject<HTMLDivElement>;
@@ -28,13 +31,14 @@ export class Home extends Component<{}, IState> {
   private orbitControls: any; // 轨道控制器
   private transformControls: any; // 传送控制器
 
-  private planes: Mesh[];
+  private geometries: Mesh[]; // 所有几何体集合
   private preGeometry: Mesh | null; // 预览几何体
 
   constructor(props: ReactPropTypes) {
     super(props);
     this.state = {
       collapsed: false,
+      preType: null,
     };
     this.stageRef = createRef();
     this.scene = new Scene();
@@ -43,12 +47,7 @@ export class Home extends Component<{}, IState> {
     this.raycaster = new Raycaster();
     this.orbitControls = null;
     this.transformControls = null;
-    this.planes = [
-      new Mesh(
-        (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
-        new MeshBasicMaterial({ visible: false }),
-      ),
-    ];
+    this.geometries = [];
     this.preGeometry = null;
   }
   componentDidMount() {
@@ -56,10 +55,9 @@ export class Home extends Component<{}, IState> {
     this.bindActions();
 
     // this.transformControls.attach(cube);
-    this.scene.add(this.planes[0]);
   }
   render() {
-    const { collapsed } = this.state;
+    const { collapsed, preType } = this.state;
     return (
       <Layout>
         <Layout>
@@ -73,10 +71,10 @@ export class Home extends Component<{}, IState> {
           collapsedWidth="50"
           collapsible={true}
           collapsed={collapsed}
-          onCollapse={val => this.setState({ collapsed: val }, this.onResize)}
+          onCollapse={val => this.setState({ collapsed: val }, this.handleResize)}
           reverseArrow={true}
         >
-          {!collapsed && <Operation addPreGeometry={this.addPreGeometry} />}
+          {!collapsed && <Operation preType={preType} setPreGeometry={this.setPreGeometry} />}
         </Sider>
       </Layout>
     );
@@ -87,12 +85,13 @@ export class Home extends Component<{}, IState> {
     const stage = this.stageRef.current;
     if (!stage) return;
 
-    window.onresize = this.onResize;
-    stage.onmousemove = this.onStageMove;
+    window.onresize = this.handleResize;
+    stage.onmousemove = this.handleMouseMove;
+    stage.onmouseup = this.handleMouseUp;
   }
 
   // 大小变化重新渲染
-  private onResize = () => {
+  private handleResize = () => {
     const stage = this.stageRef.current;
     if (!stage) return;
 
@@ -102,21 +101,21 @@ export class Home extends Component<{}, IState> {
     this.camera.updateProjectionMatrix();
   }
 
-  // 鼠标移动几何体随动
-  private onStageMove = ({ clientX, clientY }: MouseEvent) => {
+  // 鼠标移动预览几何体随动
+  private handleMouseMove = ({ clientX, clientY }: MouseEvent) => {
     const stage = this.stageRef.current;
     if (!stage || !this.preGeometry) return;
-
     const { offsetWidth, offsetHeight } = stage;
-    const [x, y] = [ // three.js 标准坐标
-      -(offsetWidth / 2 - clientX) / (offsetWidth / 2),
-      (offsetHeight / 2 - clientY) / (offsetHeight / 2),
-    ];
-    this.raycaster.setFromCamera(new Vector2(x, y), this.camera);
+    this.raycaster.setFromCamera(
+      new Vector2(
+        -(offsetWidth / 2 - clientX) / (offsetWidth / 2),
+        (offsetHeight / 2 - clientY) / (offsetHeight / 2),
+      ), // three.js 标准坐标
+      this.camera,
+    );
 
-    const intersect = this.raycaster.intersectObjects(this.planes)[0];
+    const intersect = this.raycaster.intersectObjects(this.geometries)[0];
     if (!intersect) return;
-
     const { point, face } = intersect;
     this.preGeometry.position
       .copy(point) // 跟随鼠标位置
@@ -127,11 +126,31 @@ export class Home extends Component<{}, IState> {
     this.renderThree();
   }
 
-  // 添加几何体
-  private addPreGeometry = (geometry: Mesh) => {
-    this.preGeometry = geometry;
-    this.scene.add(geometry);
+  // 鼠标点击
+  private handleMouseUp = ({ button }: MouseEvent) => {
+    if (!this.preGeometry) return;
+    if (button === 0) { // 左键-将预览几何体转为实体
+      const geometry = this.preGeometry.clone();
+      geometry.material = new MeshLambertMaterial({ color: BASE_COLOR });
+      this.scene.add(geometry);
+      this.geometries.push(geometry);
+      this.renderThree();
+    } else if (button === 2) { // 右键-删除预览几何体
+      this.setPreGeometry(null);
+    }
+  }
+
+  // 设置预览几何体
+  private setPreGeometry = (preType: IGeometrys | null) => {
+    if (this.preGeometry) this.scene.remove(this.preGeometry);
+    if (!preType) {
+      this.preGeometry = null;
+    } else {
+      this.preGeometry = createTypePreGeometry(preType);
+      this.scene.add(this.preGeometry);
+    }
     this.renderThree();
+    this.setState({ preType });
   }
 
   // canvas 渲染
@@ -158,6 +177,7 @@ export class Home extends Component<{}, IState> {
 
   // 初始化渲染器
   private initRenderer = (width: number, height: number) => {
+    this.renderer.shadowMapEnabled = true;
     this.renderer.setSize(width, height);
   }
 
@@ -171,7 +191,12 @@ export class Home extends Component<{}, IState> {
 
   // 初始化光源
   private initLight = () => {
-    this.scene.add(new AmbientLight(0xFF0000)); // 环境光
+    const directionalLight = new DirectionalLight('#fff');
+    directionalLight.position.set(4, 3, 2).normalize();
+    this.scene.add(
+      new AmbientLight('#606060'),
+      directionalLight,
+    );
   }
 
   // 初始化坐标系
@@ -194,12 +219,18 @@ export class Home extends Component<{}, IState> {
         new Vector3(i, 0, MAX_SIZE),
       );
     }
+    const plane = new Mesh(
+      (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
+      new MeshLambertMaterial({ visible: false }),
+    ); // 平面(隐藏)
     this.scene.add(
       new LineSegments(
         geometry,
         new LineBasicMaterial({ color: '#000', opacity: .1, transparent: true }),
-      )
+      ),
+      plane,
     );
+    this.geometries.push(plane);
   }
 
   // 初始化轨道控制器
@@ -207,10 +238,22 @@ export class Home extends Component<{}, IState> {
     this.orbitControls = new OrbitControls(this.camera, this.renderer.domElement);
     this.orbitControls.maxDistance = 2 * MAX_SIZE;
     this.orbitControls.minDistance = 2 * STEP;
-    this.orbitControls.addEventListener('change', this.renderThree);
+
+    const stage = this.stageRef.current;
+    if (!stage) return;
+
+    this.orbitControls.addEventListener('change', () => {
+      stage.onmouseup = null;
+      if (this.preGeometry) this.preGeometry.visible = false;
+      this.renderThree();
+    });
+    this.orbitControls.addEventListener('end', () => {
+      stage.onmouseup = this.handleMouseUp;
+      if (this.preGeometry) this.preGeometry.visible = true;
+    });
   }
 
-  // 初始化轨道控制器
+  // 初始化传送控制器
   private initTransformControls = () => {
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
     this.transformControls.addEventListener('change', this.renderThree);

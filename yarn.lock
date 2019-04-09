@@ -672,6 +672,11 @@
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
 
+"@types/dat.gui@^0.7.2":
+  version "0.7.2"
+  resolved "http://registry.npm.taobao.org/@types/dat.gui/download/@types/dat.gui-0.7.2.tgz#f6964d39504e97533774954e3dcf7a9f669196e8"
+  integrity sha1-9pZNOVBOl1M3dJVOPc96n2aRlug=
+
 "@types/node@^11.13.0":
   version "11.13.0"
   resolved "http://registry.npm.taobao.org/@types/node/download/@types/node-11.13.0.tgz#b0df8d6ef9b5001b2be3a94d909ce3c29a80f9e1"
@@ -2163,6 +2168,11 @@ dashdash@^1.12.0:
   integrity sha1-hTz6D3y+L+1d4gMmuN1YEDX24vA=
   dependencies:
     assert-plus "^1.0.0"
+
+dat.gui@^0.7.6:
+  version "0.7.6"
+  resolved "http://registry.npm.taobao.org/dat.gui/download/dat.gui-0.7.6.tgz#92182a0f2dc96c26910f888238d3839166d82f76"
+  integrity sha1-khgqDy3JbCaRD4iCONODkWbYL3Y=
 
 date-now@^0.1.4:
   version "0.1.4"

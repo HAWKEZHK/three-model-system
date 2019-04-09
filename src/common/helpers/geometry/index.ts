@@ -2,22 +2,24 @@ import {
   Geometry, MeshLambertMaterial, Mesh, BoxGeometry, SphereGeometry, CylinderGeometry, TorusGeometry,
 } from 'three';
 
-import { STEP } from '@/constants';
+import { STEP, BASE_COLOR } from '@/constants';
 import { IGeometrys } from '@/common/models';
 
-// 创建几何体
-export const createGeometry = (
+// 创建预览几何体
+export const createPreGeometry = (
   geometry: Geometry, // 几何体
-  isPre?: boolean, // 是否为预览状态
 ): Mesh => new Mesh(
   geometry,
-  new MeshLambertMaterial({ color: '#ff0000', opacity: isPre ? .5 : 1, transparent: true }),
+  new MeshLambertMaterial({
+    color: BASE_COLOR,
+    opacity: .5,
+    transparent: true,
+  }),
 );
 
-// 创建指定的几何体
-export const createTypeGeometry = (
+// 创建指定的预览几何体
+export const createTypePreGeometry = (
   type: IGeometrys, // 几何体类型
-  isPre?: boolean, // 是否为预览状态
 ): Mesh => {
   let geometry = new Geometry();
   switch (type) {
@@ -26,5 +28,5 @@ export const createTypeGeometry = (
     case 'cylinder': geometry = new CylinderGeometry(STEP / 2, STEP / 2, STEP); break;
     case 'torus': geometry = new TorusGeometry(STEP / 2, STEP / 4, STEP, STEP); break;
   }
-  return createGeometry(geometry, isPre);
+  return createPreGeometry(geometry);
 };
