@@ -66,7 +66,7 @@ module.exports = {
           }
         ]
       }, {
-        test: /\.less$/,
+        test: /\.(css|less)$/,
         exclude: /src/, // 排除业务代码
         use: [
           'style-loader',

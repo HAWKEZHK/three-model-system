@@ -10,3 +10,7 @@ declare module 'three-transformcontrols' {
   const module: any;
   export default module;
 }
+declare module 'react-dat-gui' {
+  const module: any;
+  export = module;
+}

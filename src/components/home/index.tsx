@@ -9,7 +9,7 @@ import {
 import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
 
-import { createTypePreGeometry } from '@/common/helpers';
+import { createPreGeometry, createTypePreGeometry } from '@/common/helpers';
 import { MAX_SIZE, STEP, CAMARE, BASE_COLOR } from '@/constants';
 import { IGeometrys } from '@/common/models';
 import { Operation } from '../operation';
@@ -88,6 +88,7 @@ export class Home extends Component<{}, IState> {
     window.onresize = this.handleResize;
     stage.onmousemove = this.handleMouseMove;
     stage.onmouseup = this.handleMouseUp;
+    stage.ondblclick = this.handledbClick;
   }
 
   // 大小变化重新渲染
@@ -103,18 +104,9 @@ export class Home extends Component<{}, IState> {
 
   // 鼠标移动预览几何体随动
   private handleMouseMove = ({ clientX, clientY }: MouseEvent) => {
-    const stage = this.stageRef.current;
-    if (!stage || !this.preGeometry) return;
-    const { offsetWidth, offsetHeight } = stage;
-    this.raycaster.setFromCamera(
-      new Vector2(
-        -(offsetWidth / 2 - clientX) / (offsetWidth / 2),
-        (offsetHeight / 2 - clientY) / (offsetHeight / 2),
-      ), // three.js 标准坐标
-      this.camera,
-    );
+    if (!this.preGeometry) return;
 
-    const intersect = this.raycaster.intersectObjects(this.geometries)[0];
+    const intersect = this.getIntersect(clientX, clientY);
     if (!intersect) return;
     const { point, face } = intersect;
     this.preGeometry.position
@@ -126,31 +118,32 @@ export class Home extends Component<{}, IState> {
     this.renderThree();
   }
 
-  // 鼠标点击
+  // 鼠标点击-添加或删除预览几何体
   private handleMouseUp = ({ button }: MouseEvent) => {
     if (!this.preGeometry) return;
+
     if (button === 0) { // 左键-将预览几何体转为实体
       const geometry = this.preGeometry.clone();
       geometry.material = new MeshLambertMaterial({ color: BASE_COLOR });
-      this.scene.add(geometry);
-      this.geometries.push(geometry);
+      this.addEntity(geometry);
       this.renderThree();
     } else if (button === 2) { // 右键-删除预览几何体
       this.setPreGeometry(null);
     }
   }
 
-  // 设置预览几何体
-  private setPreGeometry = (preType: IGeometrys | null) => {
-    if (this.preGeometry) this.scene.remove(this.preGeometry);
-    if (!preType) {
-      this.preGeometry = null;
-    } else {
-      this.preGeometry = createTypePreGeometry(preType);
+  // 鼠标双击-实体转化为预览几何体
+  private handledbClick = ({ clientX, clientY }: MouseEvent) => {
+    if (this.preGeometry) return;
+
+    const intersect = this.getIntersect(clientX, clientY);
+    if (!intersect) return;
+    const mesh = intersect.object as Mesh;
+    const geometry = mesh.geometry as Geometry;
+    this.removeEntity(mesh, () => {
+      this.preGeometry = createPreGeometry(geometry);
       this.scene.add(this.preGeometry);
-    }
-    this.renderThree();
-    this.setState({ preType });
+    });
   }
 
   // canvas 渲染
@@ -219,18 +212,17 @@ export class Home extends Component<{}, IState> {
         new Vector3(i, 0, MAX_SIZE),
       );
     }
-    const plane = new Mesh(
-      (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
-      new MeshLambertMaterial({ visible: false }),
-    ); // 平面(隐藏)
     this.scene.add(
       new LineSegments(
         geometry,
         new LineBasicMaterial({ color: '#000', opacity: .1, transparent: true }),
       ),
-      plane,
     );
-    this.geometries.push(plane);
+    const plane = new Mesh(
+      (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
+      new MeshLambertMaterial({ visible: false }),
+    ); // 平面(隐藏)
+    this.addEntity(plane);
   }
 
   // 初始化轨道控制器
@@ -258,5 +250,45 @@ export class Home extends Component<{}, IState> {
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
     this.transformControls.addEventListener('change', this.renderThree);
     this.scene.add(this.transformControls);
+  }
+
+  // 得到目标元素
+  private getIntersect = (mouseX: number, mouseY: number) => {
+    const stage = this.stageRef.current;
+    if (!stage) return;
+    const { offsetWidth, offsetHeight } = stage;
+    this.raycaster.setFromCamera(
+      new Vector2(
+        -(offsetWidth / 2 - mouseX) / (offsetWidth / 2),
+        (offsetHeight / 2 - mouseY) / (offsetHeight / 2),
+      ), // three.js 标准坐标
+      this.camera,
+    );
+    return this.raycaster.intersectObjects(this.geometries)[0];
+  }
+  // 设置预览几何体
+  private setPreGeometry = (preType: IGeometrys | null) => {
+    if (this.preGeometry) this.scene.remove(this.preGeometry);
+    if (!preType) {
+      this.preGeometry = null;
+    } else {
+      this.preGeometry = createTypePreGeometry(preType);
+      this.scene.add(this.preGeometry);
+    }
+    this.renderThree();
+    this.setState({ preType });
+  }
+  // 添加实体
+  private addEntity = (mesh: Mesh) => {
+    this.scene.add(mesh);
+    this.geometries.push(mesh);
+  }
+  // 移除实体
+  private removeEntity = (mesh: Mesh, callback?: () => void) => {
+    const index = this.geometries.indexOf(mesh);
+    if (index === 0) return;
+    this.geometries.splice(index, 1);
+    this.scene.remove(mesh);
+    callback && callback();
   }
 }
