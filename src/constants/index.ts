@@ -1,4 +1,4 @@
-import { IGeometrys } from '@/common/models';
+import { IGeometrys, IParams } from '@/common/models';
 
 // 最大值
 export const MAX_SIZE = 1000;
@@ -18,8 +18,52 @@ export const CAMARE = {
 
 // 基础几何体
 export const GEOMETRYS: { name: string, type: IGeometrys }[] = [
-  { name: '正方体', type: 'cube' },
-  { name: '球体', type: 'sphere' },
-  { name: '柱体', type: 'cylinder' },
-  { name: '环', type: 'torus' },
+  { name: '正方体', type: 'BoxGeometry' },
+  { name: '球体', type: 'SphereGeometry' },
+  { name: '柱体', type: 'CylinderGeometry' },
+  { name: '环', type: 'TorusGeometry' },
 ];
+
+// 默认值
+export const DEFAULT_POS = { x: -MAX_SIZE, y: -MAX_SIZE, z: -MAX_SIZE };
+export const DEFAULT_PARAMS: IParams = {
+  DEFAULT: {
+    width: 0,
+    height: 0,
+    depth: 0,
+  },
+  BoxGeometry: {
+    width: STEP,
+    height: STEP,
+    depth: STEP,
+    widthSegments: undefined,
+    heightSegments: undefined,
+    depthSegments: undefined,
+  },
+  SphereGeometry: {
+    radius: STEP / 2,
+    widthSegments: STEP,
+    heightSegments: STEP,
+    phiStart: undefined,
+    phiLength: undefined,
+    thetaStart: undefined,
+    thetaLength: undefined,
+  },
+  CylinderGeometry: {
+    radiusTop: STEP / 2,
+    radiusBottom: STEP / 2,
+    height: STEP,
+    radiusSegments: undefined,
+    heightSegments: undefined,
+    openEnded: undefined,
+    thetaStart: undefined,
+    thetaLength: undefined,
+  },
+  TorusGeometry: {
+    radius: STEP / 2,
+    tube: STEP / 4,
+    radialSegments: STEP,
+    tubularSegments: STEP,
+    arc: undefined,
+  },
+};

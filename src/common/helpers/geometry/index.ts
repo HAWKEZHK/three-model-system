@@ -2,8 +2,8 @@ import {
   Geometry, MeshLambertMaterial, Mesh, BoxGeometry, SphereGeometry, CylinderGeometry, TorusGeometry,
 } from 'three';
 
-import { STEP, BASE_COLOR } from '@/constants';
-import { IGeometrys } from '@/common/models';
+import { BASE_COLOR, DEFAULT_PARAMS } from '@/constants';
+import { IGeometrys, IParams } from '@/common/models';
 
 // 创建预览几何体
 export const createPreGeometry = (
@@ -18,15 +18,45 @@ export const createPreGeometry = (
 );
 
 // 创建指定的预览几何体
-export const createTypePreGeometry = (
-  type: IGeometrys, // 几何体类型
-): Mesh => {
+interface ICreateTypePreGeometry {
+  (
+    type: IGeometrys, // 几何体类型
+    params?: IParams[IGeometrys], // 参数
+  ): Mesh
+}
+export const createTypePreGeometry: ICreateTypePreGeometry = (
+  type, params = DEFAULT_PARAMS[type]
+) => {
   let geometry = new Geometry();
   switch (type) {
-    case 'cube': geometry = new BoxGeometry(STEP, STEP, STEP); break;
-    case 'sphere': geometry = new SphereGeometry(STEP / 2, STEP, STEP); break;
-    case 'cylinder': geometry = new CylinderGeometry(STEP / 2, STEP / 2, STEP); break;
-    case 'torus': geometry = new TorusGeometry(STEP / 2, STEP / 4, STEP, STEP); break;
+    case 'BoxGeometry': {
+      const {
+        width, height, depth, widthSegments, heightSegments, depthSegments,
+      } = params as IParams['BoxGeometry'];
+      geometry = new BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
+      break;
+    }
+    case 'SphereGeometry': {
+      const {
+        radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength,
+      } = params as IParams['SphereGeometry'];
+      geometry = new SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
+      break;
+    }
+    case 'CylinderGeometry': {
+      const {
+        radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength,
+      } = params as IParams['CylinderGeometry'];
+      geometry = new CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+      break;
+    }
+    case 'TorusGeometry': {
+      const {
+        radius, tube, radialSegments, tubularSegments, arc,
+      } = params as IParams['TorusGeometry'];
+      geometry = new TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
+      break;
+    }
   }
   return createPreGeometry(geometry);
 };
