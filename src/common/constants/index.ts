@@ -35,19 +35,19 @@ export const DEFAULT_PARAMS: IParams = {
   },
   SphereGeometry: {
     radius: STEP / 2,
-    widthSeg: STEP,
-    heightSeg: STEP,
+    widthSegments: STEP,
+    heightSegments: STEP,
   },
   CylinderGeometry: {
     radiusTop: STEP / 2,
     radiusBottom: STEP / 2,
     height: STEP,
-    radiusSeg: STEP,
+    radiusSegments: STEP,
   },
   TorusGeometry: {
     radius: STEP / 2,
     tube: STEP / 4,
-    radialSeg: STEP,
-    tubularSeg: STEP,
+    radialSegments: STEP,
+    tubularSegments: STEP,
   },
 };

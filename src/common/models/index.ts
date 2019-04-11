@@ -13,19 +13,27 @@ export interface IParams {
   },
   SphereGeometry: {
     radius: number;
-    widthSeg: number;
-    heightSeg: number;
+    widthSegments: number;
+    heightSegments: number;
   },
   CylinderGeometry: {
     radiusTop: number;
     radiusBottom: number;
     height: number;
-    radiusSeg: number;
+    radiusSegments: number;
   },
   TorusGeometry: {
     radius: number;
     tube: number;
-    radialSeg: number;
-    tubularSeg: number;
+    radialSegments: number;
+    tubularSegments: number;
   },
+}
+
+
+export interface ICommon {
+  preType: IGeometrys | null; // 几何体类型
+  prePos: { x: number, y: number, z: number }; // 预览几何体位置
+  preParams: IParams['DEFAULT'] | IParams[IGeometrys]; // 预览几何体参数
+  movable: boolean; // 是否可移动
 }

@@ -2,7 +2,7 @@ import {
   Geometry, MeshLambertMaterial, Mesh, BoxGeometry, SphereGeometry, CylinderGeometry, TorusGeometry,
 } from 'three';
 
-import { BASE_COLOR, DEFAULT_PARAMS } from '@/constants';
+import { BASE_COLOR, DEFAULT_PARAMS } from '@/common/constants';
 import { IGeometrys, IParams } from '@/common/models';
 
 // 创建预览几何体
@@ -19,10 +19,7 @@ export const createPreGeometry = (
 
 // 创建指定的预览几何体
 interface ICreateTypePreGeometry {
-  (
-    type: IGeometrys, // 几何体类型
-    params?: IParams[IGeometrys], // 参数
-  ): Mesh
+  (type: IGeometrys, params?: IParams[IGeometrys]): Mesh
 }
 export const createTypePreGeometry: ICreateTypePreGeometry = (
   type, params = DEFAULT_PARAMS[type]
@@ -35,18 +32,18 @@ export const createTypePreGeometry: ICreateTypePreGeometry = (
       break;
     }
     case 'SphereGeometry': {
-      const { radius, widthSeg, heightSeg } = params as IParams['SphereGeometry'];
-      geometry = new SphereGeometry(radius, widthSeg, heightSeg);
+      const { radius, widthSegments, heightSegments } = params as IParams['SphereGeometry'];
+      geometry = new SphereGeometry(radius, widthSegments, heightSegments);
       break;
     }
     case 'CylinderGeometry': {
-      const { radiusTop, radiusBottom, height, radiusSeg } = params as IParams['CylinderGeometry'];
-      geometry = new CylinderGeometry(radiusTop, radiusBottom, height, radiusSeg);
+      const { radiusTop, radiusBottom, height, radiusSegments } = params as IParams['CylinderGeometry'];
+      geometry = new CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments);
       break;
     }
     case 'TorusGeometry': {
-      const { radius, tube, radialSeg, tubularSeg } = params as IParams['TorusGeometry'];
-      geometry = new TorusGeometry(radius, tube, radialSeg, tubularSeg);
+      const { radius, tube, radialSegments, tubularSegments } = params as IParams['TorusGeometry'];
+      geometry = new TorusGeometry(radius, tube, radialSegments, tubularSegments);
       break;
     }
   }
