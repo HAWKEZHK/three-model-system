@@ -65,6 +65,23 @@ export class Operation extends Component<IProps> {
           className={card}
           size="small"
           bordered={false}
+          title={`旋转信息-${preName}`}
+          extra={
+            <a href="javascript:;" onClick={lockMove}>
+              <Icon type={movable ? 'unlock' : 'lock'} />
+            </a>
+          }
+        >
+          <DatGui className={gui} data={prePos} onUpdate={updatePrePos}>
+            {Object.keys(prePos).map(
+              name => <DatNumber key={name} path={name} label={name} min={-MAX_SIZE} max={MAX_SIZE} step={STEP / 4} />
+            )}
+          </DatGui>
+        </Card>
+        <Card
+          className={card}
+          size="small"
+          bordered={false}
           title={`几何信息-${preName}`}
           extra={<a href="javascript:;" onClick={preToEntity}>保存</a>}
         >

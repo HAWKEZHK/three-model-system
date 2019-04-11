@@ -54,8 +54,6 @@ export class Home extends Component<{}, IState> {
   componentDidMount() {
     this.initThree();
     this.bindActions();
-
-    // this.transformControls.attach(cube);
   }
   render() {
     const { collapsed, preType, prePos, preParams, movable } = this.state;
@@ -136,9 +134,9 @@ export class Home extends Component<{}, IState> {
     if (!this.preGeometry) return;
 
     let movable = true;
-    if (button === 0) movable = false; // 左键-将预览几何体固定位置
     if (button === 2) this.setPreGeometry(null); // 右键-删除预览几何体
-    this.setState({ movable });
+    if (button === 0) movable = false; // 左键-将预览几何体固定位置
+    this.lockMove(movable);
   }
 
   // 鼠标双击-实体转化为预览几何体
@@ -168,7 +166,15 @@ export class Home extends Component<{}, IState> {
   }
 
   // canvas 渲染
-  private renderThree = () => this.renderer.render(this.scene, this.camera);
+  private renderThree = () => {
+    if (this.preGeometry) {
+      this.scene.add(this.transformControls);
+      this.transformControls.attach(this.preGeometry);
+    } else {
+      this.scene.remove(this.transformControls);
+    }
+    this.renderer.render(this.scene, this.camera);
+  }
 
   // 初始化
   private initThree = () => {
@@ -261,8 +267,10 @@ export class Home extends Component<{}, IState> {
   // 初始化传送控制器
   private initTransformControls = () => {
     this.transformControls = new TransformControls(this.camera, this.renderer.domElement);
-    this.transformControls.addEventListener('change', this.renderThree);
-    this.scene.add(this.transformControls);
+    this.transformControls.addEventListener('change', (data: any) => {
+      console.info(data);
+      this.renderThree();
+    });
   }
 
   // 得到目标元素
@@ -282,10 +290,8 @@ export class Home extends Component<{}, IState> {
 
   // 设置预览几何体位置
   private updatePrePos = ({ x, y, z }: IState['prePos']) => {
-    if (!this.preGeometry) {
-      this.noSelTip();
-      return;
-    }
+    if (!this.preGeometry) { this.noSelTip(); return; }
+    this.transformControls.setMode('translate');
     this.preGeometry.position.set(x, y, z);
     this.renderThree();
     this.setState({ prePos: { x, y, z } });
@@ -293,12 +299,10 @@ export class Home extends Component<{}, IState> {
 
   // 设置预览几何体参数
   private updatePreParams = (preParams: IParams[IGeometrys]) => {
-    if (!this.preGeometry) {
-      this.noSelTip();
-      return;
-    }
+    if (!this.preGeometry) { this.noSelTip(); return; }
     const { preType, prePos: { x, y, z } } = this.state;
     if (!preType) return;
+    this.transformControls.setMode('scale');
     this.scene.remove(this.preGeometry);
     this.preGeometry = createTypePreGeometry(preType, preParams);
     this.preGeometry.position.set(x, y, z);
@@ -333,13 +337,13 @@ export class Home extends Component<{}, IState> {
   }
 
   // 改变是否可移动状态
-  private lockMove = () => {
-    if (!this.preGeometry) {
-      this.noSelTip();
-      return;
-    }
-    const { movable } = this.state;
-    this.setState({ movable: !movable });
+  private lockMove = (bool?: boolean) => {
+    if (!this.preGeometry) { this.noSelTip(); return; }
+    let movable = !this.state.movable;
+    if (typeof(bool) === 'boolean') movable = bool;
+    this.transformControls.setMode(`${movable ? 'translate' : 'scale'}`);
+    this.renderThree();
+    this.setState({ movable });
   }
 
   // 添加实体
@@ -350,8 +354,8 @@ export class Home extends Component<{}, IState> {
 
   // 未选择提示
   private noSelTip = () => {
-    this.setState({ prePos: DEFAULT_POS, preParams: DEFAULT_PARAMS.DEFAULT });
     const messages = document.body.querySelector('.ant-message-notice');
     if (!messages) message.warning('还未选择几何体');
+    this.setState({ prePos: DEFAULT_POS, preParams: DEFAULT_PARAMS.DEFAULT });
   }
 }
