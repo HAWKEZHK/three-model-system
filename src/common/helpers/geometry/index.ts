@@ -30,31 +30,23 @@ export const createTypePreGeometry: ICreateTypePreGeometry = (
   let geometry = new Geometry();
   switch (type) {
     case 'BoxGeometry': {
-      const {
-        width, height, depth, widthSegments, heightSegments, depthSegments,
-      } = params as IParams['BoxGeometry'];
-      geometry = new BoxGeometry(width, height, depth, widthSegments, heightSegments, depthSegments);
+      const { width, height, depth } = params as IParams['BoxGeometry'];
+      geometry = new BoxGeometry(width, height, depth);
       break;
     }
     case 'SphereGeometry': {
-      const {
-        radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength,
-      } = params as IParams['SphereGeometry'];
-      geometry = new SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength);
+      const { radius, widthSeg, heightSeg } = params as IParams['SphereGeometry'];
+      geometry = new SphereGeometry(radius, widthSeg, heightSeg);
       break;
     }
     case 'CylinderGeometry': {
-      const {
-        radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength,
-      } = params as IParams['CylinderGeometry'];
-      geometry = new CylinderGeometry(radiusTop, radiusBottom, height, radiusSegments, heightSegments, openEnded, thetaStart, thetaLength);
+      const { radiusTop, radiusBottom, height, radiusSeg } = params as IParams['CylinderGeometry'];
+      geometry = new CylinderGeometry(radiusTop, radiusBottom, height, radiusSeg);
       break;
     }
     case 'TorusGeometry': {
-      const {
-        radius, tube, radialSegments, tubularSegments, arc,
-      } = params as IParams['TorusGeometry'];
-      geometry = new TorusGeometry(radius, tube, radialSegments, tubularSegments, arc);
+      const { radius, tube, radialSeg, tubularSeg } = params as IParams['TorusGeometry'];
+      geometry = new TorusGeometry(radius, tube, radialSeg, tubularSeg);
       break;
     }
   }

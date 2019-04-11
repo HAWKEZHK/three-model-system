@@ -1,9 +1,9 @@
 import { IGeometrys, IParams } from '@/common/models';
 
 // 最大值
-export const MAX_SIZE = 1000;
+export const MAX_SIZE = 1200;
 // 一个刻度
-export const STEP = 50;
+export const STEP = 60;
 // 几何体颜色
 export const BASE_COLOR = '#ff0000';
 
@@ -25,45 +25,29 @@ export const GEOMETRYS: { name: string, type: IGeometrys }[] = [
 ];
 
 // 默认值
-export const DEFAULT_POS = { x: -MAX_SIZE, y: -MAX_SIZE, z: -MAX_SIZE };
+export const DEFAULT_POS = { x: 0, y: 0, z: 0 };
 export const DEFAULT_PARAMS: IParams = {
-  DEFAULT: {
-    width: 0,
-    height: 0,
-    depth: 0,
-  },
+  DEFAULT: { width: 0, height: 0, depth: 0 },
   BoxGeometry: {
     width: STEP,
     height: STEP,
     depth: STEP,
-    widthSegments: undefined,
-    heightSegments: undefined,
-    depthSegments: undefined,
   },
   SphereGeometry: {
     radius: STEP / 2,
-    widthSegments: STEP,
-    heightSegments: STEP,
-    phiStart: undefined,
-    phiLength: undefined,
-    thetaStart: undefined,
-    thetaLength: undefined,
+    widthSeg: STEP,
+    heightSeg: STEP,
   },
   CylinderGeometry: {
     radiusTop: STEP / 2,
     radiusBottom: STEP / 2,
     height: STEP,
-    radiusSegments: undefined,
-    heightSegments: undefined,
-    openEnded: undefined,
-    thetaStart: undefined,
-    thetaLength: undefined,
+    radiusSeg: STEP,
   },
   TorusGeometry: {
     radius: STEP / 2,
     tube: STEP / 4,
-    radialSegments: STEP,
-    tubularSegments: STEP,
-    arc: undefined,
+    radialSeg: STEP,
+    tubularSeg: STEP,
   },
 };
