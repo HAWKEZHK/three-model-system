@@ -35,7 +35,11 @@ export class Operation extends Component<IProps> {
       <div className={container}>
         <Card className={card} size="small" bordered={false} title="基础几何体">
           {GEOMETRYS.map(({ name, type }) => (
-            <CheckableTag key={type} checked={type === preType} onChange={() => setPreGeometry(type)}>
+            <CheckableTag
+              key={type}
+              checked={type === preType}
+              onChange={() => (type !== preType) && setPreGeometry(type)}
+            >
               {name}
             </CheckableTag>
           ))}
