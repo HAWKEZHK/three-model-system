@@ -15,10 +15,12 @@ const { container, card, gui } = styles;
 
 interface IProps extends ICommon {
   updatePrePos: ({ x, y, z }: IProps['prePos']) => void; // 设置预览几何体位置
+  updatePreRotate: ({ x, y, z }: IProps['preRotate']) => void; // 设置预览几何体位置
   updatePreParams: (params: IParams[IGeometrys]) => void; // 设置预览几何体参数
   setPreGeometry: (preType: IGeometrys | null) => void; // 生成指定预览几何体
   preToEntity: () => void; // 将预览几何体转为实体
   lockMove: () => void; // 改变是否可移动状态
+  lockRotate: () => void; // 改变是否可旋转状态
 }
 export class Operation extends Component<IProps> {
   constructor(props: IProps) {
@@ -26,8 +28,9 @@ export class Operation extends Component<IProps> {
   }
   render() {
     const {
-      preType, prePos, preParams, movable,
-      setPreGeometry, updatePrePos, updatePreParams, lockMove, preToEntity,
+      preType, prePos, preRotate, preParams, movable, rotatable,
+      setPreGeometry, lockMove, lockRotate, preToEntity,
+      updatePrePos, updatePreRotate, updatePreParams,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
@@ -44,6 +47,7 @@ export class Operation extends Component<IProps> {
             </CheckableTag>
           ))}
         </Card>
+
         <Card
           className={card}
           size="small"
@@ -51,7 +55,7 @@ export class Operation extends Component<IProps> {
           title={`位置信息-${preName}`}
           extra={
             <a href="javascript:;" onClick={lockMove}>
-              <Icon type={movable ? 'unlock' : 'lock'} />
+              <Icon type={movable ? 'unlock' : 'lock'} theme="twoTone" />
             </a>
           }
         >
@@ -61,23 +65,25 @@ export class Operation extends Component<IProps> {
             )}
           </DatGui>
         </Card>
+
         <Card
           className={card}
           size="small"
           bordered={false}
-          title={`旋转信息-${preName}`}
+          title={`旋转信息(度)-${preName}`}
           extra={
-            <a href="javascript:;" onClick={lockMove}>
-              <Icon type={movable ? 'unlock' : 'lock'} />
+            <a href="javascript:;" onClick={lockRotate}>
+              <Icon type={rotatable ? 'unlock' : 'lock'} theme="twoTone" />
             </a>
           }
         >
-          <DatGui className={gui} data={prePos} onUpdate={updatePrePos}>
-            {Object.keys(prePos).map(
-              name => <DatNumber key={name} path={name} label={name} min={-MAX_SIZE} max={MAX_SIZE} step={STEP / 4} />
+          <DatGui className={gui} data={preRotate} onUpdate={updatePreRotate}>
+            {Object.keys(preRotate).map(
+              name => <DatNumber key={name} path={name} label={name} min={-180} max={180} step={1} />
             )}
           </DatGui>
         </Card>
+
         <Card
           className={card}
           size="small"

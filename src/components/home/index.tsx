@@ -10,7 +10,7 @@ import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
 
 import { createPreGeometry, createTypePreGeometry } from '@/common/helpers';
-import { MAX_SIZE, STEP, CAMARE, BASE_COLOR, DEFAULT_POS, DEFAULT_PARAMS } from '@/common/constants';
+import { MAX_SIZE, STEP, CAMARE, BASE_COLOR, DEFAULT_XYZ, DEFAULT_PARAMS } from '@/common/constants';
 import { IGeometrys, IParams, ICommon } from '@/common/models';
 import { Operation } from '../operation';
 import styles from './index.less';
@@ -37,8 +37,10 @@ export class Home extends Component<{}, IState> {
     this.state = {
       collapsed: false,
       movable: true,
+      rotatable: false,
       preType: null,
-      prePos: DEFAULT_POS,
+      prePos: DEFAULT_XYZ,
+      preRotate: DEFAULT_XYZ,
       preParams: DEFAULT_PARAMS.DEFAULT,
     };
     this.stageRef = createRef();
@@ -56,7 +58,7 @@ export class Home extends Component<{}, IState> {
     this.bindActions();
   }
   render() {
-    const { collapsed, preType, prePos, preParams, movable } = this.state;
+    const { collapsed, preType, prePos, preRotate, preParams, movable, rotatable } = this.state;
     return (
       <Layout>
         <Layout>
@@ -77,13 +79,17 @@ export class Home extends Component<{}, IState> {
             <Operation
               preType={preType}
               prePos={prePos}
+              preRotate={preRotate}
               preParams={preParams}
               movable={movable}
+              rotatable={rotatable}
               setPreGeometry={this.setPreGeometry}
               updatePrePos={this.updatePrePos}
+              updatePreRotate={this.updatePreRotate}
               updatePreParams={this.updatePreParams}
               preToEntity={this.preToEntity}
               lockMove={this.lockMove}
+              lockRotate={this.lockRotate}
             />
           )}
         </Sider>
@@ -133,10 +139,12 @@ export class Home extends Component<{}, IState> {
   private handleMouseUp = ({ button }: MouseEvent) => {
     if (!this.preGeometry) return;
 
-    let movable = true;
-    if (button === 2) this.setPreGeometry(null); // 右键-删除预览几何体
-    if (button === 0) movable = false; // 左键-将预览几何体固定位置
-    this.lockMove(movable);
+    if (button === 0) this.lockMove(false); // 左键-将预览几何体固定位置
+
+    if (button === 2) { // 右键-删除预览几何体
+      this.lockMove(true);
+      this.setPreGeometry(null);
+    }
   }
 
   // 鼠标双击-实体转化为预览几何体
@@ -291,10 +299,20 @@ export class Home extends Component<{}, IState> {
   // 设置预览几何体位置
   private updatePrePos = ({ x, y, z }: IState['prePos']) => {
     if (!this.preGeometry) { this.noSelTip(); return; }
-    this.transformControls.setMode('translate');
     this.preGeometry.position.set(x, y, z);
+    this.transformControls.setMode('translate');
     this.renderThree();
-    this.setState({ prePos: { x, y, z } });
+    this.setState({ prePos: { x, y, z }, movable: true, rotatable: false });
+  }
+
+  // 设置预览几何体旋转信息
+  private updatePreRotate = ({ x, y, z }: IState['preRotate']) => {
+    if (!this.preGeometry) { this.noSelTip(); return; }
+    const [radX, radY, radZ] = [x, y, z].map(item => item * Math.PI / 180);
+    this.preGeometry.rotation.set(radX, radY, radZ);
+    this.transformControls.setMode('rotate');
+    this.renderThree();
+    this.setState({ preRotate: { x, y, z }, movable: false, rotatable: true });
   }
 
   // 设置预览几何体参数
@@ -308,7 +326,29 @@ export class Home extends Component<{}, IState> {
     this.preGeometry.position.set(x, y, z);
     this.scene.add(this.preGeometry);
     this.renderThree();
-    this.setState({ preParams });
+    this.setState({ preParams, movable: false, rotatable: false });
+  }
+
+  // 改变是否可移动状态
+  private lockMove = (bool?: boolean) => {
+    if (!this.preGeometry) { this.noSelTip(); return; }
+
+    let movable = !this.state.movable;
+    if (typeof(bool) === 'boolean') movable = bool;
+    this.transformControls.setMode(`${movable ? 'translate' : 'rotate'}`);
+    this.renderThree();
+    this.setState({ movable, rotatable: !movable });
+  }
+
+  // 改变是否可旋转状态
+  private lockRotate = (bool?: boolean) => {
+    if (!this.preGeometry) { this.noSelTip(); return; }
+
+    let rotatable = !this.state.rotatable;
+    if (typeof(bool) === 'boolean') rotatable = bool;
+    this.transformControls.setMode(`${rotatable ? 'rotate' : 'scale'}`);
+    this.renderThree();
+    this.setState({ rotatable, movable: !rotatable });
   }
 
   // 生成指定预览几何体
@@ -323,7 +363,7 @@ export class Home extends Component<{}, IState> {
       this.scene.add(this.preGeometry);
     }
     this.renderThree();
-    this.setState({ preType, prePos: DEFAULT_POS, preParams, movable: true });
+    this.setState({ preType, prePos: DEFAULT_XYZ, preParams, movable: true });
   }
 
   // 将预览几何体转为实体
@@ -336,16 +376,6 @@ export class Home extends Component<{}, IState> {
     this.setState({ movable: true });
   }
 
-  // 改变是否可移动状态
-  private lockMove = (bool?: boolean) => {
-    if (!this.preGeometry) { this.noSelTip(); return; }
-    let movable = !this.state.movable;
-    if (typeof(bool) === 'boolean') movable = bool;
-    this.transformControls.setMode(`${movable ? 'translate' : 'scale'}`);
-    this.renderThree();
-    this.setState({ movable });
-  }
-
   // 添加实体
   private addEntity = (mesh: Mesh) => {
     this.scene.add(mesh);
@@ -356,6 +386,6 @@ export class Home extends Component<{}, IState> {
   private noSelTip = () => {
     const messages = document.body.querySelector('.ant-message-notice');
     if (!messages) message.warning('还未选择几何体');
-    this.setState({ prePos: DEFAULT_POS, preParams: DEFAULT_PARAMS.DEFAULT });
+    this.setState({ prePos: DEFAULT_XYZ, preParams: DEFAULT_PARAMS.DEFAULT });
   }
 }

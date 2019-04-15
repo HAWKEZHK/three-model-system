@@ -18,14 +18,14 @@ export const CAMARE = {
 
 // 基础几何体
 export const GEOMETRYS: { name: string, type: IGeometrys }[] = [
-  { name: '正方体', type: 'BoxGeometry' },
+  { name: '立方体', type: 'BoxGeometry' },
   { name: '球体', type: 'SphereGeometry' },
   { name: '柱体', type: 'CylinderGeometry' },
   { name: '环', type: 'TorusGeometry' },
 ];
 
 // 默认值
-export const DEFAULT_POS = { x: 0, y: 0, z: 0 };
+export const DEFAULT_XYZ = { x: 0, y: 0, z: 0 };
 export const DEFAULT_PARAMS: IParams = {
   DEFAULT: { width: 0, height: 0, depth: 0 },
   BoxGeometry: {
