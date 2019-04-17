@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Tag, Icon } from 'antd';
 import DatGui, * as ReactDatGui from 'react-dat-gui';
 
-import { IGeometrys, IParams, ICommon } from '@/common/models';
+import { IGeometrys, ICommon, IChangeType } from '@/common/models';
 import { GEOMETRYS, MAX_SIZE, STEP } from '@/common/constants';
 
 import styles from './index.less';
@@ -14,13 +14,12 @@ const { CheckableTag } = Tag;
 const { container, card, gui } = styles;
 
 interface IProps extends ICommon {
-  updatePrePos: ({ x, y, z }: IProps['prePos']) => void; // 设置预览几何体位置
-  updatePreRotate: ({ x, y, z }: IProps['preRotate']) => void; // 设置预览几何体位置
-  updatePreParams: (params: IParams[IGeometrys]) => void; // 设置预览几何体参数
   setPreGeometry: (preType: IGeometrys | null) => void; // 生成指定预览几何体
-  preToEntity: () => void; // 将预览几何体转为实体
-  lockMove: () => void; // 改变是否可移动状态
-  lockRotate: () => void; // 改变是否可旋转状态
+  confirm: (type: IChangeType) => void; // 改变状态
+  update: (
+    changeType: IChangeType,
+    query: IProps['prePos'] | IProps['preRotate'] | IProps['preParams'],
+  ) => void; // 更新参数
 }
 export class Operation extends Component<IProps> {
   constructor(props: IProps) {
@@ -28,9 +27,8 @@ export class Operation extends Component<IProps> {
   }
   render() {
     const {
-      preType, prePos, preRotate, preParams, movable, rotatable,
-      setPreGeometry, lockMove, lockRotate, preToEntity,
-      updatePrePos, updatePreRotate, updatePreParams,
+      preType, prePos, preRotate, preParams, changeType,
+      setPreGeometry, confirm, update,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
@@ -54,12 +52,12 @@ export class Operation extends Component<IProps> {
           bordered={false}
           title={`位置信息-${preName}`}
           extra={
-            <a href="javascript:;" onClick={lockMove}>
-              <Icon type={movable ? 'unlock' : 'lock'} theme="twoTone" />
+            <a href="javascript:;" onClick={() => confirm('pos')}>
+              <Icon type={changeType === 'pos' ? 'unlock' : 'lock'} theme="twoTone" />
             </a>
           }
         >
-          <DatGui className={gui} data={prePos} onUpdate={updatePrePos}>
+          <DatGui className={gui} data={prePos} onUpdate={(query: IProps['prePos']) => update('pos', query)}>
             {Object.keys(prePos).map(
               name => <DatNumber key={name} path={name} label={name} min={-MAX_SIZE} max={MAX_SIZE} step={STEP / 4} />
             )}
@@ -72,12 +70,12 @@ export class Operation extends Component<IProps> {
           bordered={false}
           title={`旋转信息(度)-${preName}`}
           extra={
-            <a href="javascript:;" onClick={lockRotate}>
-              <Icon type={rotatable ? 'unlock' : 'lock'} theme="twoTone" />
+            <a href="javascript:;" onClick={() => confirm('rotate')}>
+              <Icon type={changeType === 'rotate' ? 'unlock' : 'lock'} theme="twoTone" />
             </a>
           }
         >
-          <DatGui className={gui} data={preRotate} onUpdate={updatePreRotate}>
+          <DatGui className={gui} data={preRotate} onUpdate={(query: IProps['preRotate']) => update('rotate', query)}>
             {Object.keys(preRotate).map(
               name => <DatNumber key={name} path={name} label={name} min={-180} max={180} step={1} />
             )}
@@ -89,9 +87,9 @@ export class Operation extends Component<IProps> {
           size="small"
           bordered={false}
           title={`几何信息-${preName}`}
-          extra={<a href="javascript:;" onClick={preToEntity}>保存</a>}
+          extra={<a href="javascript:;" onClick={() => confirm('params')}>保存</a>}
         >
-          <DatGui className={gui} data={preParams} onUpdate={updatePreParams}>
+          <DatGui className={gui} data={preParams} onUpdate={(query: IProps['preParams']) => update('params', query)}>
             {Object.keys(preParams).map(
               name => {
                 if (name.includes('Segments')) return (

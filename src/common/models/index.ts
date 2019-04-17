@@ -1,4 +1,5 @@
 export type IGeometrys = 'BoxGeometry' | 'SphereGeometry' | 'CylinderGeometry' | 'TorusGeometry';
+export type IChangeType = 'pos' | 'rotate' | 'params';
 
 export interface IParams {
   DEFAULT: {
@@ -36,6 +37,5 @@ export interface ICommon {
   prePos: { x: number, y: number, z: number }; // 预览几何体位置
   preRotate: { x: number, y: number, z: number }; // 预览几何体旋转位置
   preParams: IParams['DEFAULT'] | IParams[IGeometrys]; // 预览几何体参数
-  movable: boolean; // 是否可移动
-  rotatable: boolean; // 是否可操作旋转
+  changeType: IChangeType | null; // 操作类型
 }
