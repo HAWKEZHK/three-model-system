@@ -68,7 +68,7 @@ export class Home extends Component<{}, IState> {
         <Sider
           className={sider}
           width="300"
-          collapsedWidth="50"
+          collapsedWidth="40"
           collapsible={true}
           reverseArrow={true}
           collapsed={collapsed}

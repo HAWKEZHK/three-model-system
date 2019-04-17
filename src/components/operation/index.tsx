@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Tag, Icon } from 'antd';
+import { Card, Tag, Icon, Upload } from 'antd';
 import DatGui, * as ReactDatGui from 'react-dat-gui';
 
 import { IGeometrys, ICommon, IChangeType } from '@/common/models';
@@ -9,9 +9,10 @@ import styles from './index.less';
 import 'react-dat-gui/build/react-dat-gui.css';
 
 const { DatNumber } = ReactDatGui;
-
 const { CheckableTag } = Tag;
-const { container, card, gui } = styles;
+const { Dragger } = Upload;
+
+const { container, card, gui, dragger, inbox, tip, hint } = styles;
 
 interface IProps extends ICommon {
   setPreGeometry: (preType: IGeometrys | null) => void; // 生成指定预览几何体
@@ -28,7 +29,7 @@ export class Operation extends Component<IProps> {
   render() {
     const {
       preType, prePos, preRotate, preParams, changeType,
-      setPreGeometry, confirm, update,
+      setPreGeometry, update, confirm,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
@@ -101,6 +102,20 @@ export class Operation extends Component<IProps> {
               }
             )}
           </DatGui>
+        </Card>
+
+        <Card
+          className={card}
+          size="small"
+          bordered={false}
+          title="文件操作"
+          extra={<a href="javascript:;">下载文件</a>}
+        >
+          <Dragger className={dragger}>
+            <Icon className={inbox} type="inbox" />
+            <p className={tip}>上传文件以预览</p>
+            <p className={hint}>.obj / .json</p>
+          </Dragger>
         </Card>
       </div>
     );
