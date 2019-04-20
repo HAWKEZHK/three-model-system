@@ -31,11 +31,15 @@ export interface IParams {
   },
 }
 
-
 export interface ICommon {
-  preType: IGeometrys | null; // 几何体类型
+  preType: IGeometrys | 'External' | null; // 几何体类型
   prePos: { x: number, y: number, z: number }; // 预览几何体位置
   preRotate: { x: number, y: number, z: number }; // 预览几何体旋转位置
   preParams: IParams['DEFAULT'] | IParams[IGeometrys]; // 预览几何体参数
   changeType: IChangeType | null; // 操作类型
+}
+
+export interface IThreeMenu {
+  type: string;
+  items: string[];
 }

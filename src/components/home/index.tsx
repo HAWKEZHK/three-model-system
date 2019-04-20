@@ -9,10 +9,10 @@ import {
 import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
 
-import { createPreGeometry, createTypePreGeometry } from '@/common/helpers';
+import { createpreMesh, createTypepreMesh } from '@/common/helpers';
 import { MAX_SIZE, STEP, CAMARE, BASE_COLOR, DEFAULT_XYZ, DEFAULT_PARAMS } from '@/common/constants';
 import { IGeometrys, ICommon, IChangeType } from '@/common/models';
-import { Operation } from '../operation';
+import { Operation, ThreeDrawer } from '@/components';
 import styles from './index.less';
 
 const { Content, Sider } = Layout;
@@ -20,6 +20,7 @@ const { container, sider, content, close } = styles;
 
 interface IState extends ICommon {
   collapsed: boolean; // 侧边栏状态
+  drawerVisible: boolean; // 抽屉打开状态
 }
 export class Home extends Component<{}, IState> {
   private stageRef: RefObject<HTMLDivElement>;
@@ -30,12 +31,13 @@ export class Home extends Component<{}, IState> {
   private orbitControls: any; // 轨道控制器
   private transformControls: any; // 传送控制器
   private entities: Mesh[]; // 所有实体集合
-  private preGeometry: Mesh | null; // 预览几何体
+  private preMesh: Mesh | null; // 预览几何体
 
   constructor(props: ReactPropTypes) {
     super(props);
     this.state = {
       collapsed: false,
+      drawerVisible: false,
       preType: null,
       prePos: DEFAULT_XYZ,
       preRotate: DEFAULT_XYZ,
@@ -50,14 +52,14 @@ export class Home extends Component<{}, IState> {
     this.orbitControls = null;
     this.transformControls = null;
     this.entities = [];
-    this.preGeometry = null;
+    this.preMesh = null;
   }
   componentDidMount() {
     this.initThree();
     this.bindActions();
   }
   render() {
-    const { collapsed, preType, prePos, preRotate, preParams, changeType } = this.state;
+    const { collapsed, drawerVisible, preType, prePos, preRotate, preParams, changeType } = this.state;
     return (
       <Layout>
         <Layout>
@@ -81,12 +83,18 @@ export class Home extends Component<{}, IState> {
               preRotate={preRotate}
               preParams={preParams}
               changeType={changeType}
-              setPreGeometry={this.setPreGeometry}
+              setpreMesh={this.setpreMesh}
               update={this.update}
               confirm={this.confirm}
+              openDrawer={() => this.setState({ drawerVisible: true })}
             />
           )}
         </Sider>
+        <ThreeDrawer
+          visible={drawerVisible}
+          closeDrawer={() => this.setState({ drawerVisible: false })}
+          addToScene={this.addExternal}
+        />
       </Layout>
     );
   }
@@ -116,7 +124,7 @@ export class Home extends Component<{}, IState> {
   // 鼠标移动预览几何体随动
   private handleMouseMove = ({ clientX, clientY }: MouseEvent) => {
     const { changeType } = this.state;
-    if (!this.preGeometry || !(changeType === 'pos')) return;
+    if (!this.preMesh || !(changeType === 'pos')) return;
 
     const intersect = this.getIntersect(clientX, clientY);
     if (!intersect) return;
@@ -133,18 +141,18 @@ export class Home extends Component<{}, IState> {
   // 鼠标点击-添加或删除预览几何体
   private handleMouseUp = ({ button }: MouseEvent) => {
     const { changeType } = this.state;
-    if (!this.preGeometry) return;
+    if (!this.preMesh) return;
 
     if (button === 0 && changeType === 'pos') this.setState({ changeType: 'rotate' }, this.renderThree); // 左键-将预览几何体固定位置
     if (button === 2) { // 右键-删除预览几何体
-      this.setPreGeometry(null);
+      this.setpreMesh(null);
       this.setState({ changeType: 'pos' });
     }
   }
 
   // 鼠标双击-实体转化为预览几何体
   private handledbClick = ({ clientX, clientY }: MouseEvent) => {
-    if (this.preGeometry) return;
+    if (this.preMesh) return;
     const intersect = this.getIntersect(clientX, clientY);
     if (!intersect) return;
 
@@ -161,10 +169,10 @@ export class Home extends Component<{}, IState> {
     this.scene.remove(mesh);
 
     // 生成相同属性的预览几何体
-    this.preGeometry = createPreGeometry(geometry);
-    this.preGeometry.position.copy(prePos);
-    this.preGeometry.rotation.copy(preRotate);
-    this.scene.add(this.preGeometry);
+    this.preMesh = createpreMesh(geometry);
+    this.preMesh.position.copy(prePos);
+    this.preMesh.rotation.copy(preRotate);
+    this.scene.add(this.preMesh);
 
     const x = preRotate.x * 180 / Math.PI;
     const y = preRotate.y * 180 / Math.PI;
@@ -175,9 +183,9 @@ export class Home extends Component<{}, IState> {
   // canvas 渲染
   private renderThree = () => {
     const { changeType } = this.state;
-    if (this.preGeometry && changeType === 'rotate') {
+    if (this.preMesh && changeType === 'rotate') {
       this.scene.add(this.transformControls);
-      this.transformControls.attach(this.preGeometry);
+      this.transformControls.attach(this.preMesh);
     } else {
       this.scene.remove(this.transformControls);
     }
@@ -262,12 +270,12 @@ export class Home extends Component<{}, IState> {
     this.orbitControls.addEventListener('change', () => {
       const { changeType } = this.state;
       stage.onmouseup = null;
-      if (this.preGeometry && changeType === 'pos') this.preGeometry.visible = false; // 隐藏可移动的预览几何体
+      if (this.preMesh && changeType === 'pos') this.preMesh.visible = false; // 隐藏可移动的预览几何体
       this.renderThree();
     });
     this.orbitControls.addEventListener('end', () => {
       stage.onmouseup = this.handleMouseUp;
-      if (this.preGeometry) this.preGeometry.visible = true;
+      if (this.preMesh) this.preMesh.visible = true;
       this.renderThree();
     });
   }
@@ -303,16 +311,16 @@ export class Home extends Component<{}, IState> {
   }
 
   // 生成指定预览几何体
-  private setPreGeometry = (preType: IState['preType']) => {
-    if (this.preGeometry) this.scene.remove(this.preGeometry);
+  private setpreMesh = (preType: IGeometrys | null) => {
+    if (this.preMesh) this.scene.remove(this.preMesh);
     let preParams: IState['preParams'] = DEFAULT_PARAMS.DEFAULT;
 
     if (!preType) {
-      this.preGeometry = null;
+      this.preMesh = null;
     } else {
       preParams = DEFAULT_PARAMS[preType];
-      this.preGeometry = createTypePreGeometry(preType);
-      this.scene.add(this.preGeometry);
+      this.preMesh = createTypepreMesh(preType);
+      this.scene.add(this.preMesh);
     }
     this.setState({ preType, prePos: DEFAULT_XYZ, preParams, changeType: 'pos' }, this.renderThree);
   }
@@ -322,7 +330,7 @@ export class Home extends Component<{}, IState> {
     changeType: IChangeType,
     query: IState['prePos'] | IState['preRotate'] | IState['preParams'],
   ) => {
-    if (!this.preGeometry) {
+    if (!this.preMesh) {
       this.noSelTip();
       return;
     }
@@ -330,14 +338,14 @@ export class Home extends Component<{}, IState> {
     switch (changeType) {
       case 'pos': {
         const { x, y, z } = query as IState['prePos'];
-        this.preGeometry.position.set(x, y, z);
+        this.preMesh.position.set(x, y, z);
         this.setState({ changeType, prePos: { x, y, z } }, this.renderThree);
         break;
       }
       case 'rotate': {
         const { x, y, z } = query as IState['preRotate'];
         const [radX, radY, radZ] = [x, y, z].map(item => item * Math.PI / 180);
-        this.preGeometry.rotation.set(radX, radY, radZ);
+        this.preMesh.rotation.set(radX, radY, radZ);
         this.setState({ changeType, preRotate: { x, y, z } }, this.renderThree);
         break;
       }
@@ -345,14 +353,18 @@ export class Home extends Component<{}, IState> {
         const preParams = query as IState['preParams'];
         const { preType, prePos, preRotate } = this.state;
         if (!preType) return;
-        this.scene.remove(this.preGeometry);
+        if (preType === 'External') {
+          this.noSelTip();
+          return;
+        }
+        this.scene.remove(this.preMesh);
 
-        this.preGeometry = createTypePreGeometry(preType, preParams);
+        this.preMesh = createTypepreMesh(preType, preParams);
         const [radX, radY, radZ] = [preRotate.x, preRotate.y, preRotate.z].map(item => item * Math.PI / 180);
-        this.preGeometry.position.set(prePos.x, prePos.y, prePos.z);
-        this.preGeometry.rotation.set(radX, radY, radZ);
+        this.preMesh.position.set(prePos.x, prePos.y, prePos.z);
+        this.preMesh.rotation.set(radX, radY, radZ);
 
-        this.scene.add(this.preGeometry);
+        this.scene.add(this.preMesh);
 
         this.setState({ changeType, preParams }, this.renderThree);
         break;
@@ -362,7 +374,7 @@ export class Home extends Component<{}, IState> {
 
   // 保存参数
   private confirm = (type: IChangeType) => {
-    if (!this.preGeometry) {
+    if (!this.preMesh) {
       this.noSelTip();
       return;
     }
@@ -375,13 +387,20 @@ export class Home extends Component<{}, IState> {
         break;
       }
       case 'params': { // 转化为实体
-        const mesh = this.preGeometry.clone();
+        const mesh = this.preMesh.clone();
         mesh.material = new MeshLambertMaterial({ color: BASE_COLOR });
         this.addEntity(mesh);
         this.setState({ changeType: 'pos' }, this.renderThree);
         break;
       }
     }
+  }
+
+  // 添加外部模型
+  private addExternal = (mesh: Mesh) => {
+    this.preMesh = mesh;
+    this.scene.add(this.preMesh);
+    this.setState({ changeType: 'pos', preType: 'External' }, this.renderThree);
   }
 
   // 添加实体

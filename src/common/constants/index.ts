@@ -1,4 +1,4 @@
-import { IGeometrys, IParams } from '@/common/models';
+import { IGeometrys, IParams, IThreeMenu } from '@/common/models';
 
 // 最大值
 export const MAX_SIZE = 1200;
@@ -51,3 +51,20 @@ export const DEFAULT_PARAMS: IParams = {
     tubularSegments: STEP,
   },
 };
+
+// 3D 库
+export const LIB_SRC = 'src/static/3d-files';
+export const THREE_MENU: IThreeMenu[] = [
+  {
+    type: 'JSON',
+    items: [],
+  },
+  {
+    type: 'OBJ',
+    items: [],
+  },
+  {
+    type: 'STL',
+    items: ['螺丝', '螺母'],
+  },
+];
