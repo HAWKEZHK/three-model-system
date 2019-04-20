@@ -14,7 +14,11 @@ declare module 'react-dat-gui' {
   const module: any;
   export = module;
 }
-declare module 'three-stl-loader' {
+declare module 'three-obj-mtl-loader' {
   const module: any;
   export = module;
+}
+declare module 'three-stl-loader' {
+  const module: any;
+  export default module;
 }

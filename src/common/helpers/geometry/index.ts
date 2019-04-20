@@ -6,7 +6,7 @@ import { BASE_COLOR, DEFAULT_PARAMS } from '@/common/constants';
 import { IGeometrys, IParams } from '@/common/models';
 
 // 创建预览几何体
-export const createpreMesh = (
+export const createPreThree = (
   geometry: Geometry, // 几何体
 ): Mesh => new Mesh(
   geometry,
@@ -18,10 +18,10 @@ export const createpreMesh = (
 );
 
 // 创建指定的预览几何体
-interface ICreateTypepreMesh {
+interface ICreateTypePreThree {
   (type: IGeometrys, params?: IParams[IGeometrys]): Mesh
 }
-export const createTypepreMesh: ICreateTypepreMesh = (
+export const createTypePreThree: ICreateTypePreThree = (
   type, params = DEFAULT_PARAMS[type]
 ) => {
   let geometry = new Geometry();
@@ -47,5 +47,5 @@ export const createTypepreMesh: ICreateTypepreMesh = (
       break;
     }
   }
-  return createpreMesh(geometry);
+  return createPreThree(geometry);
 };

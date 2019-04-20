@@ -15,7 +15,7 @@
     "react-dat-gui": "^3.0.0",
     "react-dom": "^16.8.6",
     "three": "^0.103.0",
-    "three-obj-loader": "^1.1.3",
+    "three-obj-mtl-loader": "^1.0.3",
     "three-orbitcontrols": "^2.102.1",
     "three-stl-loader": "^1.0.6",
     "three-transformcontrols": "^0.78.1"

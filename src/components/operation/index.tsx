@@ -12,7 +12,7 @@ const { DatNumber } = ReactDatGui;
 const { CheckableTag } = Tag;
 
 interface IProps extends ICommon {
-  setpreMesh: (preType: IGeometrys | null) => void; // 生成指定预览几何体
+  setPreThree: (preType: IGeometrys | null) => void; // 生成指定预览几何体
   confirm: (type: IChangeType) => void; // 改变状态
   update: (
     changeType: IChangeType,
@@ -28,7 +28,7 @@ export class Operation extends Component<IProps, {}> {
   render() {
     const {
       preType, prePos, preRotate, preParams, changeType,
-      setpreMesh, update, confirm, openDrawer,
+      setPreThree, update, confirm, openDrawer,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
@@ -39,7 +39,7 @@ export class Operation extends Component<IProps, {}> {
             <CheckableTag
               key={type}
               checked={type === preType}
-              onChange={() => (type !== preType) && setpreMesh(type)}
+              onChange={() => (type !== preType) && setPreThree(type)}
             >
               {name}
             </CheckableTag>

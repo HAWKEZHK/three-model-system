@@ -2,29 +2,35 @@ import React, { Component } from 'react';
 import { Icon, Drawer, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
 import * as THREE from 'three';
-import { Mesh, Geometry } from 'three';
+import { Mesh, Group, Geometry } from 'three';
+import * as threeObjMtlLoader from 'three-obj-mtl-loader';
+import STLLoader from 'three-stl-loader';
 
 import { IThreeMenu } from '@/common/models';
 import { THREE_MENU, LIB_SRC } from '@/common/constants';
-import { createpreMesh } from '@/common/helpers';
+import { createPreThree } from '@/common/helpers';
 
 import styles from './index.less';
 
 const { SubMenu } = Menu;
-const STLLoader = require('three-stl-loader')(THREE);
+const { OBJLoader, MTLLoader } = threeObjMtlLoader;
 
 interface IProps {
   visible: boolean; // 抽屉代开状态
   closeDrawer: () => void; // 关闭抽屉
-  addToScene: (mesh: Mesh) => void;
+  addToPreThree: (preThree: Mesh | Group) => void; // 转化为预览几何体
 }
 export class ThreeDrawer extends Component<IProps, {}> {
+  private objLoader: any;
+  private mtlLoader: any;
   private stlLoader: any;
 
   constructor(props: IProps) {
     super(props);
     this.state = {};
-    this.stlLoader = new STLLoader();
+    this.objLoader = new OBJLoader();
+    this.mtlLoader = new MTLLoader();
+    this.stlLoader = new (STLLoader(THREE))();
   }
   render() {
     const { visible, closeDrawer } = this.props;
@@ -50,15 +56,34 @@ export class ThreeDrawer extends Component<IProps, {}> {
 
   // 选中
   private handleSelect = ({ keyPath }: ClickParam) => {
-    const { closeDrawer, addToScene } = this.props;
+    const { addToPreThree, closeDrawer } = this.props;
     const [name, type] = keyPath;
-    switch (type) {
-      case 'STL': {
-        this.stlLoader.load(`${LIB_SRC}/STL/${name}.stl`,(geometry: Geometry) => addToScene(createpreMesh(geometry)));
-        break;
+    const baseSrc = `${LIB_SRC}/${type}/${name}`;
+    try {
+      switch (type) {
+        case 'OBJ-MTL': {
+          this.mtlLoader.load(`${baseSrc}/${name}.mtl`, (materials: any) => {
+            materials.preload();
+            this.objLoader.setMaterials(materials);
+
+            this.objLoader.load(`${baseSrc}/${name}.obj`, (group: Group) => {
+              addToPreThree(group);
+              closeDrawer();
+            });
+          });
+          break;
+        }
+        case 'STL': {
+          this.stlLoader.load(`${baseSrc}.stl`, (geometry: Geometry) => {
+            addToPreThree(createPreThree(geometry));
+            closeDrawer();
+          });
+          break;
+        }
+        default: break;
       }
-      default: break;
+    } catch (err) {
+      console.info('err');
     }
-    setTimeout(closeDrawer, 500);
   }
 }

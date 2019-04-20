@@ -56,15 +56,11 @@ export const DEFAULT_PARAMS: IParams = {
 export const LIB_SRC = 'src/static/3d-files';
 export const THREE_MENU: IThreeMenu[] = [
   {
-    type: 'JSON',
-    items: [],
-  },
-  {
-    type: 'OBJ',
-    items: [],
+    type: 'OBJ-MTL',
+    items: ['宝马'],
   },
   {
     type: 'STL',
-    items: ['螺丝', '螺母'],
+    items: ['螺丝', '螺母', '龙'],
   },
 ];
