@@ -4,7 +4,7 @@ import { Layout, message } from 'antd';
 import {
   Scene, WebGLRenderer, PerspectiveCamera, ArrowHelper, Raycaster,
   Group, Mesh, Geometry, PlaneBufferGeometry, MeshLambertMaterial, Vector2, Vector3,
-  AmbientLight, DirectionalLight, LineSegments, LineBasicMaterial,
+  AmbientLight, DirectionalLight, LineSegments, LineBasicMaterial, ObjectLoader,
 } from 'three';
 import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
@@ -12,7 +12,7 @@ import OBJExporter from 'three-obj-exporter';
 import * as STLExporter from 'threejs-export-stl';
 
 import { createPreThree, createTypePreThree, downLoader } from '@/common/helpers';
-import { MAX_SIZE, STEP, CAMARE, DEFAULT_XYZ, DEFAULT_PARAMS, GEOMETRYS, BASE_COLOR } from '@/common/constants';
+import { MAX_SIZE, STEP, CAMARE, DEFAULT_XYZ, DEFAULT_PARAMS, GEOMETRYS, BASE_COLOR, DRAFT_ENTITIES } from '@/common/constants';
 import { ICommon, IChangeType, IGeometrys, IFileType } from '@/common/models';
 import { Operation, ThreeDrawer } from '@/components';
 import styles from './index.less';
@@ -58,6 +58,7 @@ export class Home extends Component<{}, IState> {
   }
   componentDidMount() {
     this.initThree();
+    this.setDraft();
     this.bindActions();
   }
   render() {
@@ -90,6 +91,7 @@ export class Home extends Component<{}, IState> {
               confirm={this.confirm}
               downloadFile={this.downloadFile}
               openDrawer={() => this.setState({ drawerVisible: true })}
+              cleanScene={this.cleanScene}
               entityNum={this.entities.length}
             />
           )}
@@ -103,10 +105,29 @@ export class Home extends Component<{}, IState> {
     );
   }
 
+  // 获取草稿内容并渲染
+  private setDraft = () => {
+    const objectLoader = new ObjectLoader();
+    const draftStr = localStorage.getItem(DRAFT_ENTITIES);
+    if (!draftStr) return;
+    let draft;
+    try { draft = JSON.parse(draftStr); } catch (err) { draft = null; }
+    draft && draft.forEach((item: any) => this.addEntity(objectLoader.parse(item)));
+    this.renderThree();
+  }
+
   // 绑定事件
   private bindActions = () => {
     const stage = this.stageRef.current;
     if (!stage) return;
+
+    // 页面离开保存草稿
+    window.onbeforeunload = () => {
+      if (this.entities.length > 1) {
+        this.entities.shift();
+        localStorage.setItem(DRAFT_ENTITIES, JSON.stringify(this.entities));
+      }
+    };
 
     window.onresize = this.handleResize;
     stage.onmousemove = this.handleMouseMove;
@@ -425,8 +446,10 @@ export class Home extends Component<{}, IState> {
           preThree.material = new MeshLambertMaterial({ color: BASE_COLOR });
           this.addEntity(preThree);
         } else {
-          this.scene.add(preThree);
-          preThree.children.forEach((item: Mesh) => this.entities.push(item));
+          preThree.children.forEach((item: Mesh) => {
+            item.position.copy(preThree.position);
+            this.addEntity(item.clone());
+          });
         }
         this.preThree.position.add(new Vector3(STEP, 0, 0));
         this.setState({ changeType: 'pos' }, this.renderThree);
@@ -442,14 +465,13 @@ export class Home extends Component<{}, IState> {
       return;
     }
     this.setPreThree(null);
-
     switch (fileType) {
       case 'OBJ': {
         const objExporter = new OBJExporter();
         const newScene = new Scene();
         this.entities.forEach((item, index) => {
           if (index === 0) return;
-          newScene.add(item);
+          newScene.add(item.clone());
         });
         downLoader(objExporter.parse(newScene), 'THREE-OBJ.obj');
         break;
@@ -462,6 +484,18 @@ export class Home extends Component<{}, IState> {
         break;
       }
     }
+  }
+
+  // 清空所有几何体
+  private cleanScene = () => {
+    this.entities.forEach((item, index) => {
+      if (index === 0) return;
+      this.scene.remove(item);
+    });
+    this.entities.length = 1;
+    localStorage.removeItem(DRAFT_ENTITIES);
+    this.renderThree();
+    message.success('清空完毕');
   }
 
   // 添加实体

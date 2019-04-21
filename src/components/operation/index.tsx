@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Tag, Icon, Modal, Radio } from 'antd';
+import { Card, Tag, Icon, Modal, Radio, Popconfirm } from 'antd';
 import DatGui, * as ReactDatGui from 'react-dat-gui';
 
 import { IGeometrys, ICommon, IChangeType, IFileType } from '@/common/models';
@@ -21,6 +21,7 @@ interface IProps extends ICommon {
   confirm: (type: IChangeType) => void; // 改变状态
   downloadFile: (fileType: IFileType) => void; // 下载文件
   openDrawer: () => void; // 打开抽屉
+  cleanScene: () => void; // 清空所有几何体
   entityNum: number; // 实体数量
 }
 interface IState {
@@ -39,14 +40,30 @@ export class Operation extends Component<IProps, IState> {
     const { fileType, modalVisible } = this.state;
     const {
       preType, prePos, preRotate, preParams, changeType,
-      setPreThree, update, confirm, openDrawer, entityNum,
+      setPreThree, update, confirm, openDrawer, cleanScene, entityNum,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
     return (
       <>
         <div className={styles.container}>
-          <Card className={styles.card} size="small" bordered={false} title="基础几何体">
+          <Card
+            className={styles.card}
+            size="small"
+            bordered={false}
+            title="基础几何体"
+            extra={
+              <Popconfirm
+                title="确定清空所有内容吗？"
+                okText="确定"
+                cancelText="取消"
+                placement="leftTop"
+                onConfirm={cleanScene}
+              >
+                <a href="javascript:;"><Icon type="delete" theme="twoTone" /></a>
+              </Popconfirm>
+            }
+          >
             {GEOMETRYS.map(({ name, type }) => (
               <CheckableTag
                 key={type}
@@ -143,7 +160,7 @@ export class Operation extends Component<IProps, IState> {
           <RadioGroup value={fileType} onChange={({ target: { value } }) => this.setState({ fileType: value })}>
             {FILE_TYPES.map((type: IFileType) => <Radio value={type} key={type}>{type}</Radio>)}
           </RadioGroup>
-          {(fileType === 'STL' && entityNum > 4) && (
+          {(fileType !== 'OBJ' && entityNum > 4) && (
             <span className={styles['modal-tip']}>
               <Icon type="exclamation-circle" />检测到几何体较多，建议使用 OBJ 格式保存
             </span>

@@ -64,10 +64,13 @@ export const THREE_MENU: IThreeMenu[] = [
   },
   {
     type: 'OBJ-MTL',
-    items: ['宝马'],
+    items: ['车'],
   },
   {
     type: 'STL',
     items: ['螺丝', '螺母'],
   },
 ];
+
+// localstorage key
+export const DRAFT_ENTITIES = 'DRAFT_ENTITIES';
