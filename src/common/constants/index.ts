@@ -52,6 +52,9 @@ export const DEFAULT_PARAMS: IParams = {
   },
 };
 
+// 保存文件类型
+export const FILE_TYPES = ['JSON', 'OBJ', 'STL'];
+
 // 3D 库（示例）
 export const LIB_SRC = 'src/static/3d-files';
 export const THREE_MENU: IThreeMenu[] = [
