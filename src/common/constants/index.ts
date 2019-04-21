@@ -52,7 +52,7 @@ export const DEFAULT_PARAMS: IParams = {
   },
 };
 
-// 3D 库
+// 3D 库（示例）
 export const LIB_SRC = 'src/static/3d-files';
 export const THREE_MENU: IThreeMenu[] = [
   {
@@ -61,6 +61,6 @@ export const THREE_MENU: IThreeMenu[] = [
   },
   {
     type: 'STL',
-    items: ['螺丝', '螺母', '龙'],
+    items: ['螺丝', '螺母'],
   },
 ];

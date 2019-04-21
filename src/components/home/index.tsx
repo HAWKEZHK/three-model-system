@@ -10,8 +10,8 @@ import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
 
 import { createPreThree, createTypePreThree } from '@/common/helpers';
-import { MAX_SIZE, STEP, CAMARE, BASE_COLOR, DEFAULT_XYZ, DEFAULT_PARAMS } from '@/common/constants';
-import { IGeometrys, ICommon, IChangeType } from '@/common/models';
+import { MAX_SIZE, STEP, CAMARE, DEFAULT_XYZ, DEFAULT_PARAMS, GEOMETRYS, BASE_COLOR } from '@/common/constants';
+import { ICommon, IChangeType, IGeometrys } from '@/common/models';
 import { Operation, ThreeDrawer } from '@/components';
 import styles from './index.less';
 
@@ -157,10 +157,6 @@ export class Home extends Component<{}, IState> {
     if (!intersect) return;
 
     const mesh = intersect.object as Mesh; // 选中的几何体
-    const { geometry, position: prePos, rotation: preRotate } = mesh as any;
-    const preType = geometry.type as IGeometrys;
-    const preParams = {} as IState['preParams'];
-    Object.keys(DEFAULT_PARAMS[preType]).forEach(key => preParams[key] = geometry.parameters[key]);
 
     // 实体数组中删除
     const index = this.entities.indexOf(mesh);
@@ -168,24 +164,41 @@ export class Home extends Component<{}, IState> {
     this.entities.splice(index, 1);
     this.scene.remove(mesh);
 
+    // 参数设定
+    const { geometry, position: prePos, rotation } = mesh as any;
+    const { type: intersectType, parameters } = geometry;
+    const preRotate = {
+      x: rotation.x * 180 / Math.PI,
+      y: rotation.y * 180 / Math.PI,
+      z: rotation.z * 180 / Math.PI,
+    };
+    let preParams = {} as IState['preParams'], preType: IState['preType'];
+    if (GEOMETRYS.map(({ type }) => type).includes(intersectType)) {
+      preType = intersectType as IGeometrys;
+      Object.keys(DEFAULT_PARAMS[preType]).forEach(key => preParams[key] = parameters[key]);
+    } else {
+      preType = 'External';
+      preParams = DEFAULT_PARAMS.DEFAULT;
+    }
+
     // 生成相同属性的预览几何体
     this.preThree = createPreThree(geometry);
     this.preThree.position.copy(prePos);
-    this.preThree.rotation.copy(preRotate);
+    this.preThree.rotation.copy(rotation);
     this.scene.add(this.preThree);
-
-    const x = preRotate.x * 180 / Math.PI;
-    const y = preRotate.y * 180 / Math.PI;
-    const z = preRotate.z * 180 / Math.PI;
-    this.setState({ preType, prePos, preRotate: { x, y, z }, preParams }, this.renderThree);
+    this.setState({ preType, prePos, preRotate, preParams }, this.renderThree);
   }
 
   // canvas 渲染
   private renderThree = () => {
     const { changeType } = this.state;
-    if (this.preThree && changeType === 'rotate') {
+    if (this.preThree) {
       this.scene.add(this.transformControls);
-      this.transformControls.attach(this.preThree);
+      if (changeType === 'rotate') {
+        this.transformControls.attach(this.preThree);
+      } else {
+        this.transformControls.detach(this.preThree);
+      }
     } else {
       this.scene.remove(this.transformControls);
     }
@@ -313,8 +326,8 @@ export class Home extends Component<{}, IState> {
   // 生成指定预览几何体
   private setPreThree = (preType: IState['preType'], preThree?: Mesh | Group) => {
     if (this.preThree) this.scene.remove(this.preThree);
-    let preParams: IState['preParams'] = DEFAULT_PARAMS.DEFAULT;
 
+    let preParams: IState['preParams'] = DEFAULT_PARAMS.DEFAULT;
     switch (preType) {
       case null: {
         this.preThree = null;
@@ -405,9 +418,16 @@ export class Home extends Component<{}, IState> {
         break;
       }
       case 'params': { // 转化为实体
-        const mesh = this.preThree.clone() as Mesh;
-        mesh.material = new MeshLambertMaterial({ color: BASE_COLOR });
-        this.addEntity(mesh);
+        const preThree = this.preThree.clone() as any;
+        const entityType = preThree.type as 'Mesh' | 'Group';
+        if (entityType === 'Mesh') {
+          preThree.material = new MeshLambertMaterial({ color: BASE_COLOR });
+          this.addEntity(preThree);
+        } else {
+          this.scene.add(preThree);
+          preThree.children.forEach((item: Mesh) => this.entities.push(item));
+        }
+
         this.setState({ changeType: 'pos' }, this.renderThree);
         break;
       }
