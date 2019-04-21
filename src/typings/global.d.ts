@@ -22,3 +22,11 @@ declare module 'three-stl-loader' {
   const module: any;
   export default module;
 }
+declare module 'threejs-export-stl' {
+  const module: any;
+  export = module;
+}
+declare module 'three-obj-exporter' {
+  const module: any;
+  export default module;
+}

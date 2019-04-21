@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Tag, Icon, Modal, Radio } from 'antd';
 import DatGui, * as ReactDatGui from 'react-dat-gui';
 
-import { IGeometrys, ICommon, IChangeType } from '@/common/models';
+import { IGeometrys, ICommon, IChangeType, IFileType } from '@/common/models';
 import { GEOMETRYS, MAX_SIZE, STEP, FILE_TYPES } from '@/common/constants';
 
 import styles from './index.less';
@@ -14,15 +14,17 @@ const RadioGroup = Radio.Group;
 
 interface IProps extends ICommon {
   setPreThree: (preType: IGeometrys | null) => void; // 生成指定预览几何体
-  confirm: (type: IChangeType) => void; // 改变状态
   update: (
     changeType: IChangeType,
     query: IProps['prePos'] | IProps['preRotate'] | IProps['preParams'],
   ) => void; // 更新参数
+  confirm: (type: IChangeType) => void; // 改变状态
+  downloadFile: (fileType: IFileType) => void; // 下载文件
   openDrawer: () => void; // 打开抽屉
+  entityNum: number; // 实体数量
 }
 interface IState {
-  fileType: string; // 保存文件类型
+  fileType: IFileType; // 保存文件类型
   modalVisible: boolean; // modal 状态
 }
 export class Operation extends Component<IProps, IState> {
@@ -37,7 +39,7 @@ export class Operation extends Component<IProps, IState> {
     const { fileType, modalVisible } = this.state;
     const {
       preType, prePos, preRotate, preParams, changeType,
-      setPreThree, update, confirm, openDrawer,
+      setPreThree, update, confirm, openDrawer, entityNum,
     } = this.props;
     const preItem = GEOMETRYS.filter(({ type }) => type === preType)[0];
     const preName = preItem ? preItem.name : '未选中几何体';
@@ -139,8 +141,13 @@ export class Operation extends Component<IProps, IState> {
           onCancel={() => this.setState({ modalVisible: false })}
         >
           <RadioGroup value={fileType} onChange={({ target: { value } }) => this.setState({ fileType: value })}>
-            {FILE_TYPES.map((type) => <Radio value={type} key={type}>{type}</Radio>)}
+            {FILE_TYPES.map((type: IFileType) => <Radio value={type} key={type}>{type}</Radio>)}
           </RadioGroup>
+          {(fileType === 'STL' && entityNum > 4) && (
+            <span className={styles['modal-tip']}>
+              <Icon type="exclamation-circle" />检测到几何体较多，建议使用 OBJ 格式保存
+            </span>
+          )}
         </Modal>
       </>
     );
@@ -148,6 +155,9 @@ export class Operation extends Component<IProps, IState> {
 
   // 文件导出
   private saveFile = () => {
+    const { fileType } = this.state;
+    const { downloadFile } = this.props;
+    downloadFile(fileType);
     this.setState({ modalVisible: false });
   }
 }

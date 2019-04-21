@@ -1,5 +1,7 @@
 export type IGeometrys = 'BoxGeometry' | 'SphereGeometry' | 'CylinderGeometry' | 'TorusGeometry';
 export type IChangeType = 'pos' | 'rotate' | 'params';
+export type IFileType = 'OBJ' | 'STL';
+
 
 export interface IParams {
   DEFAULT: {

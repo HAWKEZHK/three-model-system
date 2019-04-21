@@ -59,31 +59,34 @@ export class ThreeDrawer extends Component<IProps, {}> {
     const { addToPreThree, closeDrawer } = this.props;
     const [name, type] = keyPath;
     const baseSrc = `${LIB_SRC}/${type}/${name}`;
-    try {
-      switch (type) {
-        case 'OBJ-MTL': {
-          this.mtlLoader.load(`${baseSrc}/${name}.mtl`, (materials: any) => {
-            materials.preload();
-            this.objLoader.setMaterials(materials);
+    switch (type) {
+      case 'OBJ': {
+        this.objLoader.load(`${baseSrc}.obj`, (group: Group) => {
+          addToPreThree(group);
+          closeDrawer();
+        });
+        break;
+      }
+      case 'OBJ-MTL': {
+        this.mtlLoader.load(`${baseSrc}/${name}.mtl`, (materials: any) => {
+          materials.preload();
+          this.objLoader.setMaterials(materials);
 
-            this.objLoader.load(`${baseSrc}/${name}.obj`, (group: Group) => {
-              addToPreThree(group);
-              closeDrawer();
-            });
-          });
-          break;
-        }
-        case 'STL': {
-          this.stlLoader.load(`${baseSrc}.stl`, (geometry: Geometry) => {
-            addToPreThree(createPreThree(geometry));
+          this.objLoader.load(`${baseSrc}/${name}.obj`, (group: Group) => {
+            addToPreThree(group);
             closeDrawer();
           });
-          break;
-        }
-        default: break;
+        });
+        break;
       }
-    } catch (err) {
-      console.info('err');
+      case 'STL': {
+        this.stlLoader.load(`${baseSrc}.stl`, (geometry: Geometry) => {
+          addToPreThree(createPreThree(geometry));
+          closeDrawer();
+        });
+        break;
+      }
+      default: break;
     }
   }
 }

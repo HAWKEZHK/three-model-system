@@ -8,10 +8,12 @@ import {
 } from 'three';
 import OrbitControls from 'three-orbitcontrols';
 import TransformControls from 'three-transformcontrols';
+import OBJExporter from 'three-obj-exporter';
+import * as STLExporter from 'threejs-export-stl';
 
-import { createPreThree, createTypePreThree } from '@/common/helpers';
+import { createPreThree, createTypePreThree, downLoader } from '@/common/helpers';
 import { MAX_SIZE, STEP, CAMARE, DEFAULT_XYZ, DEFAULT_PARAMS, GEOMETRYS, BASE_COLOR } from '@/common/constants';
-import { ICommon, IChangeType, IGeometrys } from '@/common/models';
+import { ICommon, IChangeType, IGeometrys, IFileType } from '@/common/models';
 import { Operation, ThreeDrawer } from '@/components';
 import styles from './index.less';
 
@@ -86,7 +88,9 @@ export class Home extends Component<{}, IState> {
               setPreThree={this.setPreThree}
               update={this.update}
               confirm={this.confirm}
+              downloadFile={this.downloadFile}
               openDrawer={() => this.setState({ drawerVisible: true })}
+              entityNum={this.entities.length}
             />
           )}
         </Sider>
@@ -144,10 +148,7 @@ export class Home extends Component<{}, IState> {
     if (!this.preThree) return;
 
     if (button === 0 && changeType === 'pos') this.setState({ changeType: 'rotate' }, this.renderThree); // 左键-将预览几何体固定位置
-    if (button === 2) { // 右键-删除预览几何体
-      this.setPreThree(null);
-      this.setState({ changeType: 'pos' });
-    }
+    if (button === 2) this.setPreThree(null); // 右键-删除预览几何体
   }
 
   // 鼠标双击-实体转化为预览几何体
@@ -427,8 +428,37 @@ export class Home extends Component<{}, IState> {
           this.scene.add(preThree);
           preThree.children.forEach((item: Mesh) => this.entities.push(item));
         }
-
+        this.preThree.position.add(new Vector3(STEP, 0, 0));
         this.setState({ changeType: 'pos' }, this.renderThree);
+        break;
+      }
+    }
+  }
+
+  // 下载所有实体
+  private downloadFile = (fileType: IFileType) => {
+    if (this.entities.length <= 1) {
+      message.warning('场景中未找到几何体~');
+      return;
+    }
+    this.setPreThree(null);
+
+    switch (fileType) {
+      case 'OBJ': {
+        const objExporter = new OBJExporter();
+        const newScene = new Scene();
+        this.entities.forEach((item, index) => {
+          if (index === 0) return;
+          newScene.add(item);
+        });
+        downLoader(objExporter.parse(newScene), 'THREE-OBJ.obj');
+        break;
+      }
+      case 'STL': {
+        this.entities.forEach((item, index) => {
+          if (index === 0) return;
+          downLoader(STLExporter.fromMesh(item), `THREE-STL-${index}.stl`);
+        });
         break;
       }
     }

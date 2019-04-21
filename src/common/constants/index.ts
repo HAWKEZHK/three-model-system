@@ -1,4 +1,4 @@
-import { IGeometrys, IParams, IThreeMenu } from '@/common/models';
+import { IGeometrys, IParams, IThreeMenu, IFileType } from '@/common/models';
 
 // 最大值
 export const MAX_SIZE = 1200;
@@ -53,11 +53,15 @@ export const DEFAULT_PARAMS: IParams = {
 };
 
 // 保存文件类型
-export const FILE_TYPES = ['JSON', 'OBJ', 'STL'];
+export const FILE_TYPES: IFileType[] = ['OBJ', 'STL'];
 
 // 3D 库（示例）
 export const LIB_SRC = 'src/static/3d-files';
 export const THREE_MENU: IThreeMenu[] = [
+  {
+    type: 'OBJ',
+    items: ['鹿'],
+  },
   {
     type: 'OBJ-MTL',
     items: ['宝马'],
