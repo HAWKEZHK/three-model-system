@@ -25,16 +25,16 @@
       transition: border-color .3s;
       cursor: pointer;
 
-      &:hover {
-        border-color: #40a9ff;
-      }
+      &:hover { border-color: #40a9ff }
 
       .inbox {
         display: block;
         color: #40a9ff;
         font-size: 30px;
       }
+
       .tip { color: #666 }
+
       .hint {
         font-size: 12px;
         color: #999;
@@ -45,6 +45,8 @@
     :global .ant-card-body {
       display: flex;
       justify-content: space-between;
+
+      :global .ant-tag-checkable { user-select: none }
     }
   }
 
@@ -52,10 +54,12 @@
 
 .modal {
   width: 400px !important;
+
   .modal-tip {
     display: block;
     margin-top: 10px;
     font-size: 12px;
+
     i {
       margin-right: 5px;
       color: #faad14;

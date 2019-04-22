@@ -18,7 +18,6 @@ import { Operation, ThreeDrawer } from '@/components';
 import styles from './index.less';
 
 const { Content, Sider } = Layout;
-const { container, sider, content, close } = styles;
 
 interface IState extends ICommon {
   collapsed: boolean; // 侧边栏状态
@@ -66,12 +65,12 @@ export class Home extends Component<{}, IState> {
     return (
       <Layout>
         <Layout>
-          <Content className={`${content}${collapsed ? ` ${close}` : ''}`}>
-            <div className={container} ref={this.stageRef} />
+          <Content className={`${styles.content}${collapsed ? ` ${styles.close}` : ''}`}>
+            <div className={styles.container} ref={this.stageRef} />
           </Content>
         </Layout>
         <Sider
-          className={sider}
+          className={styles.sider}
           width="300"
           collapsedWidth="40"
           collapsible={true}
@@ -149,7 +148,7 @@ export class Home extends Component<{}, IState> {
   // 鼠标移动预览几何体随动
   private handleMouseMove = ({ clientX, clientY }: MouseEvent) => {
     const { changeType } = this.state;
-    if (!this.preThree || !(changeType === 'pos')) return;
+    if (!this.preThree || changeType !== 'pos') return;
 
     const intersect = this.getIntersect(clientX, clientY);
     if (!intersect) return;
@@ -520,9 +519,6 @@ export class Home extends Component<{}, IState> {
   private externalTip = () => {
     const messages = document.body.querySelector('.ant-message-notice');
     if (!messages) message.warning('不支持修改外部模型参数');
-    this.setState({
-      preParams: DEFAULT_PARAMS.DEFAULT,
-      changeType: null,
-    });
+    this.setState({ preParams: DEFAULT_PARAMS.DEFAULT });
   }
 }

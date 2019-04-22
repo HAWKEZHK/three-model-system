@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Icon, Drawer, Menu } from 'antd';
 import { ClickParam } from 'antd/lib/menu';
 import * as THREE from 'three';
@@ -20,59 +20,27 @@ interface IProps {
   closeDrawer: () => void; // 关闭抽屉
   addToPreThree: (preThree: Mesh | Group) => void; // 转化为预览几何体
 }
-export class ThreeDrawer extends Component<IProps, {}> {
-  private objLoader: any;
-  private mtlLoader: any;
-  private stlLoader: any;
-
-  constructor(props: IProps) {
-    super(props);
-    this.state = {};
-    this.objLoader = new OBJLoader();
-    this.mtlLoader = new MTLLoader();
-    this.stlLoader = new (STLLoader(THREE))();
-  }
-  render() {
-    const { visible, closeDrawer } = this.props;
-    return (
-      <Drawer
-        title={<><Icon type="tool" /> 3D 文件库</>}
-        placement="left"
-        className={styles.drawer}
-        closable={false}
-        visible={visible}
-        onClose={closeDrawer}
-      >
-        <Menu mode="inline" theme="light" defaultOpenKeys={THREE_MENU.map(({ type }) => type)} onClick={this.handleSelect}>
-          {THREE_MENU.map(({ type, items }: IThreeMenu) => (
-            <SubMenu key={type} title={`${type} 文件`}>
-              {items.map((item: string) => <Menu.Item key={item}>{item}</Menu.Item>)}
-            </SubMenu>
-          ))}
-        </Menu>
-      </Drawer>
-    );
-  }
-
+export const ThreeDrawer = ({ visible, closeDrawer, addToPreThree }: IProps) => {
   // 选中
-  private handleSelect = ({ keyPath }: ClickParam) => {
-    const { addToPreThree, closeDrawer } = this.props;
+  const handleSelect = ({ keyPath }: ClickParam) => {
     const [name, type] = keyPath;
     const baseSrc = `${LIB_SRC}/${type}/${name}`;
     switch (type) {
       case 'OBJ': {
-        this.objLoader.load(`${baseSrc}.obj`, (group: Group) => {
+        const objLoader = new OBJLoader();
+        objLoader.load(`${baseSrc}.obj`, (group: Group) => {
           addToPreThree(group);
           closeDrawer();
         });
         break;
       }
       case 'OBJ-MTL': {
-        this.mtlLoader.load(`${baseSrc}/${name}.mtl`, (materials: any) => {
+        const [objLoader, mtlLoader] = [new OBJLoader(), new MTLLoader()];
+        mtlLoader.load(`${baseSrc}/${name}.mtl`, (materials: any) => {
           materials.preload();
-          this.objLoader.setMaterials(materials);
+          objLoader.setMaterials(materials);
 
-          this.objLoader.load(`${baseSrc}/${name}.obj`, (group: Group) => {
+          objLoader.load(`${baseSrc}/${name}.obj`, (group: Group) => {
             addToPreThree(group);
             closeDrawer();
           });
@@ -80,7 +48,8 @@ export class ThreeDrawer extends Component<IProps, {}> {
         break;
       }
       case 'STL': {
-        this.stlLoader.load(`${baseSrc}.stl`, (geometry: Geometry) => {
+        const stlLoader = new (STLLoader(THREE))();
+        stlLoader.load(`${baseSrc}.stl`, (geometry: Geometry) => {
           addToPreThree(createPreThree(geometry));
           closeDrawer();
         });
@@ -88,5 +57,24 @@ export class ThreeDrawer extends Component<IProps, {}> {
       }
       default: break;
     }
-  }
-}
+  };
+
+  return (
+    <Drawer
+      title={<><Icon type="tool" /> 3D 文件库</>}
+      placement="left"
+      className={styles.drawer}
+      closable={false}
+      visible={visible}
+      onClose={closeDrawer}
+    >
+      <Menu mode="inline" theme="light" defaultOpenKeys={THREE_MENU.map(({ type }) => type)} onClick={handleSelect}>
+        {THREE_MENU.map(({ type, items }: IThreeMenu) => (
+          <SubMenu key={type} title={`${type} 文件`}>
+            {items.map((item: string) => <Menu.Item key={item}>{item}</Menu.Item>)}
+          </SubMenu>
+        ))}
+      </Menu>
+    </Drawer>
+  );
+};
