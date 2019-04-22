@@ -1,6 +1,6 @@
 const { resolve, join } = require('path');
-const { HotModuleReplacementPlugin, NamedModulesPlugin } = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const Autoprefixer = require('autoprefixer');
 const Cssnano = require('cssnano');
 
@@ -14,23 +14,12 @@ const browsers = [ // css 自动补全作用的浏览器版本
 ];
 
 module.exports = {
-  mode: "development", // 开发环境
-  devtool: 'cheap-module-source-map', // 生成 sourceMap 方式
-
-  entry: './src/entry/index.tsx', // 入口文件
-  output: {
-    filename: 'index.js', // 文件名
-    path: resolve('./output'), // 导出的本地路径
-    publicPath: '/', // devSever 上的路径
+  entry: { // 入口文件
+    index: resolve(__dirname, '../src/entry/index.tsx'),
   },
 
-  devServer: {
-    host: 'localhost',
-    port: 3000,
-    hot: true, // 是否启用热更新
-    inline: true, // 是否不使用 iframe
-    disableHostCheck: true, // 是否关闭本地 host 检查
-    compress: true, // 是否启用 gzip 压缩
+  output: {
+    publicPath: '/', // 静态资源路径
   },
 
   resolve: {
@@ -44,10 +33,11 @@ module.exports = {
       minify:{
         removeComments: true, // 移除 HTML 中的注释
         collapseWhitespace: true, // 删除空白符与换行符
+        removeRedundantAttributes: true, // 当值匹配默认值时删除属性
+        removeEmptyAttributes: true, // 移除空属性
       },
     }),
-    new HotModuleReplacementPlugin(), // 启动局部热更新的插件
-    new NamedModulesPlugin(), // 显示局部热更新的相对路径
+    new CleanWebpackPlugin(), // 编译前先删除原有文件夹
   ],
 
   module: {
