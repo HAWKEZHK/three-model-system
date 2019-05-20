@@ -88,7 +88,7 @@ export class Operation extends Component<IProps, IState> {
           >
             <DatGui className={styles.gui} data={prePos} onUpdate={(query: IProps['prePos']) => update('pos', query)}>
               {Object.keys(prePos).map(
-                name => <DatNumber key={name} path={name} label={name} min={-MAX_SIZE} max={MAX_SIZE} step={STEP / 4} />
+                name => <DatNumber key={name} path={name} label={name} min={-MAX_SIZE} max={MAX_SIZE} step={1} />
               )}
             </DatGui>
           </Card>
@@ -125,7 +125,7 @@ export class Operation extends Component<IProps, IState> {
                     <DatNumber key={name} path={name} label={name.replace('Segments', 'Seg')} min={3} max={STEP * 2} step={1} />
                   );
                   return (
-                    <DatNumber key={name} path={name} label={name} min={0} max={MAX_SIZE} step={STEP / 4} />
+                    <DatNumber key={name} path={name} label={name} min={0} max={MAX_SIZE} step={1} />
                   );
                 }
               )}

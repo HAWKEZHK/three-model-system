@@ -28,7 +28,7 @@ export class Home extends Component<{}, IState> {
   private scene: Scene; // 场景
   private camera: PerspectiveCamera;  // 相机
   private renderer: WebGLRenderer; // 渲染器
-  protected raycaster: Raycaster; // 投射器
+  private raycaster: Raycaster; // 投射器
   private orbitControls: any; // 轨道控制器
   private transformControls: any; // 传送控制器
   private entities: Mesh[]; // 所有实体集合
@@ -260,13 +260,11 @@ export class Home extends Component<{}, IState> {
   }
 
   // 初始化坐标系
-  private initAxis = () => {
-    this.scene.add(
-      new ArrowHelper(new Vector3(MAX_SIZE, 0, 0), new Vector3(-MAX_SIZE, 0, 0), 2 * MAX_SIZE, 0xFF0000, STEP),
-      new ArrowHelper(new Vector3(0, MAX_SIZE, 0), new Vector3(0, -MAX_SIZE, 0), 2 * MAX_SIZE, 0x00FF00, STEP),
-      new ArrowHelper(new Vector3(0, 0, MAX_SIZE), new Vector3(0, 0, -MAX_SIZE), 2 * MAX_SIZE, 0x0000FF, STEP),
-    );
-  }
+  private initAxis = () => this.scene.add(
+    new ArrowHelper(new Vector3(MAX_SIZE, 0, 0), new Vector3(-MAX_SIZE, 0, 0), 2 * MAX_SIZE, 0xFF0000, STEP),
+    new ArrowHelper(new Vector3(0, MAX_SIZE, 0), new Vector3(0, -MAX_SIZE, 0), 2 * MAX_SIZE, 0x00FF00, STEP),
+    new ArrowHelper(new Vector3(0, 0, MAX_SIZE), new Vector3(0, 0, -MAX_SIZE), 2 * MAX_SIZE, 0x0000FF, STEP),
+  )
 
   // 初始化网格线
   private initGridding = () => {
@@ -285,11 +283,12 @@ export class Home extends Component<{}, IState> {
         new LineBasicMaterial({ color: '#000', opacity: .1, transparent: true }),
       ),
     );
-    const plane = new Mesh(
-      (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
-      new MeshLambertMaterial({ visible: false }),
-    ); // 平面(隐藏)
-    this.addEntity(plane);
+    this.addEntity(
+      new Mesh(
+        (new PlaneBufferGeometry(2 * MAX_SIZE, 2 * MAX_SIZE)).rotateX(-Math.PI / 2),
+        new MeshLambertMaterial({ visible: false }),
+      )
+    ); // 添加平面(隐藏)
   }
 
   // 初始化轨道控制器
