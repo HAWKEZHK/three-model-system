@@ -41,8 +41,8 @@ module.exports = merge(commonConfig, {
       minRatio: 0.8,
     }),
     new copyWebpackPlugin([{ // 处理静态资源
-      from: resolve(__dirname + '/src/static'),
-      to: '/src/static',
+      from: resolve(__dirname, '../src/static'),
+      to: './src/static',
     }]),
 	],
 
