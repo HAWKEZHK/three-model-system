@@ -1,75 +1,75 @@
 # three-model-system
 
 > 基于 THREE.JS 的 3D 建模系统（毕设项目）
+ 
+### 预览 ###
+ 
+[点击访问](https://hawkezhk.github.io/three-model-system/)
 
-- 预览
-  
-  https://hawkezhk.github.io/three-model-system/
+### 技术栈 ###
 
-- 技术栈
+    React + TypeScript + Css-Module + Ant-Design + Three.js
 
-  React + TypeScript + Css-Module + Ant-Design + Three.js
+### 目录结构 ###
 
-- 目录结构
+```
+three-model-system/
+│
+│── src/                         * 源文件
+│    |
+|    |—— common/                 * 公共文件
+|    |    |
+|    |    |—— constants/         * 常数
+|    |    |
+|    |    |—— helper/            * 工具方法
+|    |    |
+|    |    |—— models/            * 模型
+|    |
+|    |—— components/             * 组件
+|    |    |
+|    |    |—— home/              * 工作区
+|    |    |
+|    |    |—— operation/         * 模型控制区
+|    |    |
+|    |    |—— three-drawer/      * 外部模型库
+│    |
+|    |—— entry/                  * 入口文件
+│    |
+|    |—— static/                 * 静态文件
+|    |    |
+|    |    |—— 3D-files/          * 3D文件
+|    |    |
+|    |    |—— images/            * 图片
+|    |    |
+|    |    |—— template/          * 模板
+│
+│── webpack/
+│    |
+|    |—— webpack.common.js       * 公共配置
+│    |
+|    |—— webpack.dev.js          * 开发环境配置
+│    |
+|    |—— webpack.prod.js         * 生产环境配置
+```
 
-  ```
-  three-model-system/
-    │
-    │── src/                         * 源文件
-    │    |
-    |    |—— common/                 * 公共文件
-    |    |    |
-    |    |    |—— constants/         * 常数
-    |    |    |
-    |    |    |—— helper/            * 工具方法
-    |    |    |
-    |    |    |—— models/            * 模型
-    |    |
-    |    |—— components/             * 组件
-    |    |    |
-    |    |    |—— home/              * 工作区
-    |    |    |
-    |    |    |—— operation/         * 模型控制区
-    |    |    |
-    |    |    |—— three-drawer/      * 外部模型库
-    │    |
-    |    |—— entry/                  * 入口文件
-    │    |
-    |    |—— static/                 * 静态文件
-    |    |    |
-    |    |    |—— 3D-files/          * 3D文件
-    |    |    |
-    |    |    |—— images/            * 图片
-    |    |    |
-    |    |    |—— template/          * 模板
-    │
-    │── webpack/
-    │    |
-    |    |—— webpack.common.js       * 公共配置
-    │    |
-    |    |—— webpack.dev.js          * 开发环境配置
-    │    |
-    |    |—— webpack.prod.js         * 生产环境配置
-  ```
+### 如何启动 ###
 
-- 如何启动
+Step 1
+```
+yarn install
+```
 
-  Step 1
-  ```
-  yarn install
-  ```
+Step 2
+```
+yarn start
+```
 
-  Step 2
-  ```
-  yarn start
-  ```
+Step 3
+```
+打开 http://localhost:3000/ 进行预览
+```
 
-  Step 3
-  ```
-  打开 http://localhost:3000/ 进行预览
-  ```
-
-- BTW
+### BTW ###
 
 > 这是毕设做的小项目，受到在公司一个大佬的启发而选的这个题目，正好也让我学习了一下 three.js。由于时间和精力问题没有将这个项目做到太完美，有几个可以优化的地方在这稍微列一下 ~（基本上是因为没有精力去写后台导致的 hh）
 
