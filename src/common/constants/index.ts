@@ -60,15 +60,15 @@ export const LIB_SRC = 'src/static/3d-files';
 export const THREE_MENU: IThreeMenu[] = [
   {
     type: 'OBJ',
-    items: ['鹿'],
+    items: ['deer'],
   },
   {
     type: 'OBJ-MTL',
-    items: ['车'],
+    items: ['car'],
   },
   {
     type: 'STL',
-    items: ['螺丝', '螺母'],
+    items: ['screw', 'nut'],
   },
 ];
 

@@ -2,6 +2,10 @@
 
 > 基于 THREE.JS 的 3D 建模系统（毕设项目）
 
+- 预览
+  
+  https://hawkezhk.github.io/three-model-system/
+
 - 技术栈
 
   React + TypeScript + Css-Module + Ant-Design + Three.js
