@@ -7,6 +7,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const Cssnano = require('cssnano');
+const copyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = merge(commonConfig, {
   mode: 'production', // 生产环境
@@ -39,6 +40,10 @@ module.exports = merge(commonConfig, {
       threshold: 10240,
       minRatio: 0.8,
     }),
+    new copyWebpackPlugin([{ // 处理静态资源
+      from: resolve(__dirname + '/src/static'),
+      to: '/src/static',
+    }]),
 	],
 
   optimization: {
